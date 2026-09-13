@@ -52,19 +52,14 @@ psql -U postgres -c "CREATE DATABASE quiz_test;"
 
 ### 3. Run Migrations
 
-Run migrations against both databases. The migration script reads `DATABASE_URL` from your environment:
-
-```bash
-npm run migrate
-npm run migrate -- --db quiz_test  # Run again for test DB if using separate migrations
-```
-
-Or set the variable inline:
+Run migrations against both databases. The migration script reads the `DATABASE_URL` environment variable, so run it once per database, setting the variable inline:
 
 ```bash
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/quiz npm run migrate
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/quiz_test npm run migrate
 ```
+
+(If `DATABASE_URL` is already exported in your shell or `.env`, `npm run migrate` migrates that database.)
 
 ### 4. Start Development Server
 
