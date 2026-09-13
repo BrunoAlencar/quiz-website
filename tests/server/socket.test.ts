@@ -111,6 +111,64 @@ describe("socket flow", () => {
     host.close(); player.close();
   });
 
+  it("fires game:over exactly once when two players submit near-simultaneously", async () => {
+    const quizId = await createQuiz(pool, sampleInput);
+
+    const host = connect();
+    await once(host, "connect");
+    const created = await emitAck<{ gameId: string; joinCode: string }>(
+      host, "host:create-game", { quizId }
+    );
+    host.emit("host:join-room", { gameId: created.gameId });
+
+    const overEvents: unknown[] = [];
+    host.on("game:over", (payload) => { overEvents.push(payload); });
+
+    const playerA = connect();
+    const playerB = connect();
+    await Promise.all([once(playerA, "connect"), once(playerB, "connect")]);
+
+    const joinedA = await emitAck<{ playerId: string; gameId: string; nickname: string }>(
+      playerA, "player:join", { joinCode: created.joinCode, nickname: "Alex" }
+    );
+    const joinedB = await emitAck<{ playerId: string; gameId: string; nickname: string }>(
+      playerB, "player:join", { joinCode: created.joinCode, nickname: "Sam" }
+    );
+
+    const questionPromiseA = once<{ id: string; options: { id: string }[] }>(playerA, "game:question");
+    const questionPromiseB = once<{ id: string; options: { id: string }[] }>(playerB, "game:question");
+    host.emit("host:start", { gameId: created.gameId });
+    const [questionA, questionB] = await Promise.all([questionPromiseA, questionPromiseB]);
+
+    now = 2000; // 2s to answer
+
+    const resultPromiseA = once<{ is_correct: boolean }>(playerA, "player:result");
+    const resultPromiseB = once<{ is_correct: boolean }>(playerB, "player:result");
+    // Registered before either submit fires, so we can't miss the event by
+    // attaching the listener too late.
+    const firstOverPromise = once(host, "game:over");
+
+    // Emit both submissions back-to-back without awaiting between them, so the
+    // synchronous portions of both handlers race before either await resolves.
+    playerA.emit("player:submit", {
+      gameId: created.gameId, playerId: joinedA.playerId, optionId: questionA.options[0].id,
+    });
+    playerB.emit("player:submit", {
+      gameId: created.gameId, playerId: joinedB.playerId, optionId: questionB.options[0].id,
+    });
+
+    await Promise.all([resultPromiseA, resultPromiseB]);
+
+    // Wait for the first game:over, then give a real-time window for a
+    // potential second (buggy, duplicate) emission to arrive.
+    await firstOverPromise;
+    await new Promise((r) => setTimeout(r, 150));
+
+    expect(overEvents.length).toBe(1);
+
+    host.close(); playerA.close(); playerB.close();
+  });
+
   it("rejects joining an unknown code", async () => {
     const player = connect();
     await once(player, "connect");

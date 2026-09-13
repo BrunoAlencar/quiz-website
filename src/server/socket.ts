@@ -34,6 +34,7 @@ export function registerSocketHandlers(io: IOServer, deps: Deps): void {
   }
 
   async function endGame(game: LiveGame) {
+    if (game.status === "ended") return;
     game.status = "ended";
     for (const p of game.players.values()) {
       await deps.setPlayerScore(db, p.id, p.score);
@@ -123,16 +124,21 @@ export function registerSocketHandlers(io: IOServer, deps: Deps): void {
       const game = store.get(gameId);
       if (!game) return;
       const q = currentQuestion(game);
-      const result = submitAnswer(game, playerId, optionId, now());
+      const submittedAt = now();
+      const result = submitAnswer(game, playerId, optionId, submittedAt);
       if (!result || !q) return;
+      // Capture round completion synchronously (before any await) so exactly one
+      // submission triggers the reveal/advance — avoids a double-fire race.
+      const completedRound = allAnswered(game);
       await deps.recordAnswer(db, {
         gameId: game.id, playerId, questionId: q.id, optionId,
-        isCorrect: result.is_correct, responseMs: now() - (game.questionStartMs ?? now()),
+        isCorrect: result.is_correct,
+        responseMs: submittedAt - (game.questionStartMs ?? submittedAt),
         pointsAwarded: result.points_awarded,
       });
       socket.emit("player:result", result);
       emitAnsweredCount(game);
-      if (allAnswered(game)) {
+      if (completedRound) {
         revealAndMaybeAdvance(game);
         if (isLastQuestion(game)) await endGame(game);
       }
