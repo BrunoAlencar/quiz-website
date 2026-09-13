@@ -88,4 +88,40 @@ describe("gameManager", () => {
     expect(isLastQuestion(game)).toBe(true);
     expect(currentQuestion(game)?.id).toBe("q1");
   });
+
+  it("returns null from submitAnswer when there is no active question", () => {
+    const { game } = makeGame();
+    addPlayer(game, "p1", "Alex");
+    // currentIndex is -1, no startQuestion called yet
+    expect(submitAnswer(game, "p1", "q0o0", 1000)).toBeNull();
+  });
+
+  it("returns null from submitAnswer for an unknown player id", () => {
+    const { game } = makeGame();
+    startQuestion(game, 1000);
+    expect(submitAnswer(game, "unknown-player", "q0o0", 1000)).toBeNull();
+  });
+
+  it("returns null from submitAnswer for an unknown option id", () => {
+    const { game } = makeGame();
+    addPlayer(game, "p1", "Alex");
+    startQuestion(game, 1000);
+    expect(submitAnswer(game, "p1", "not-a-real-option", 1000)).toBeNull();
+  });
+
+  it("throws when startQuestion is called with no remaining questions", () => {
+    const { game } = makeGame();
+    startQuestion(game, 1000);
+    startQuestion(game, 2000);
+    expect(isLastQuestion(game)).toBe(true);
+    expect(() => startQuestion(game, 3000)).toThrow(
+      "startQuestion called with no remaining questions"
+    );
+  });
+
+  it("defaults an empty/whitespace nickname to Player", () => {
+    const { game } = makeGame();
+    addPlayer(game, "p1", "   ");
+    expect(game.players.get("p1")?.nickname).toBe("Player");
+  });
 });

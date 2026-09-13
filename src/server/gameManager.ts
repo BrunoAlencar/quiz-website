@@ -18,7 +18,11 @@ export function currentQuestion(game: LiveGame): Question | null {
 }
 
 export function startQuestion(game: LiveGame, now: number): PublicQuestion {
-  game.currentIndex += 1;
+  const nextIndex = game.currentIndex + 1;
+  if (nextIndex >= game.questions.length) {
+    throw new Error("startQuestion called with no remaining questions");
+  }
+  game.currentIndex = nextIndex;
   game.questionStartMs = now;
   game.answers = new Map();
   const q = game.questions[game.currentIndex];
