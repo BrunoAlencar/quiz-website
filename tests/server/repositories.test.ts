@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import pg from "pg";
 import { createQuiz, getQuiz, listQuizzes, updateQuiz, getQuizForPlay } from "@/server/repositories/quizzes";
+import { createGame, getGameByCode, setGameStatus } from "@/server/repositories/games";
+import { createPlayer, listPlayers, setPlayerScore } from "@/server/repositories/players";
+import { recordAnswer } from "@/server/repositories/answers";
 
 const url = process.env.DATABASE_URL_TEST;
 const pool = new pg.Pool({ connectionString: url });
@@ -73,5 +76,51 @@ describe("quizzes repository", () => {
     const qs = await getQuizForPlay(pool, id);
     expect(qs).toHaveLength(1);
     expect(qs[0].options.some((o) => o.is_correct)).toBe(true);
+  });
+});
+
+describe("games/players/answers repositories", () => {
+  it("creates and finds a game by code", async () => {
+    const quizId = await createQuiz(pool, sampleInput);
+    const game = await createGame(pool, quizId, "ABC234");
+    const found = await getGameByCode(pool, "ABC234");
+    expect(found?.id).toBe(game.id);
+    expect(found?.status).toBe("lobby");
+  });
+
+  it("updates game status", async () => {
+    const quizId = await createQuiz(pool, sampleInput);
+    const game = await createGame(pool, quizId, "ABC235");
+    await setGameStatus(pool, game.id, "in_progress");
+    const found = await getGameByCode(pool, "ABC235");
+    expect(found?.status).toBe("in_progress");
+  });
+
+  it("creates and lists players, and updates score", async () => {
+    const quizId = await createQuiz(pool, sampleInput);
+    const game = await createGame(pool, quizId, "ABC236");
+    const p = await createPlayer(pool, game.id, "Alex");
+    await setPlayerScore(pool, p.id, 740);
+    const players = await listPlayers(pool, game.id);
+    expect(players.map((x) => x.nickname)).toContain("Alex");
+  });
+
+  it("records an answer and enforces one per player/question", async () => {
+    const quizId = await createQuiz(pool, sampleInput);
+    const quiz = await getQuiz(pool, quizId);
+    const q = quiz!.questions[0];
+    const correct = q.options.find((o) => o.is_correct)!;
+    const game = await createGame(pool, quizId, "ABC237");
+    const p = await createPlayer(pool, game.id, "Alex");
+    await recordAnswer(pool, {
+      gameId: game.id, playerId: p.id, questionId: q.id, optionId: correct.id,
+      isCorrect: true, responseMs: 1200, pointsAwarded: 940,
+    });
+    await expect(
+      recordAnswer(pool, {
+        gameId: game.id, playerId: p.id, questionId: q.id, optionId: correct.id,
+        isCorrect: true, responseMs: 1300, pointsAwarded: 900,
+      })
+    ).rejects.toThrow();
   });
 });
