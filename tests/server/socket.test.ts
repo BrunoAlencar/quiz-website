@@ -11,7 +11,8 @@ import { createGame } from "@/server/repositories/games";
 import { createPlayer } from "@/server/repositories/players";
 import { recordAnswer } from "@/server/repositories/answers";
 import { setPlayerScore } from "@/server/repositories/players";
-import { setGameStatus } from "@/server/repositories/games";
+import { setGameStatus, finalizeGame } from "@/server/repositories/games";
+import type { ClientToServerEvents, ServerToClientEvents } from "@/types";
 
 const url = process.env.DATABASE_URL_TEST;
 const pool = new pg.Pool({ connectionString: url });
@@ -30,17 +31,18 @@ const sampleInput = {
 };
 
 let httpServer: HttpServer;
-let io: IOServer;
+let io: IOServer<ClientToServerEvents, ServerToClientEvents>;
 let port: number;
 let now = 0;
 
 beforeAll(async () => {
   if (!url) throw new Error("DATABASE_URL_TEST must be set");
   httpServer = createServer();
-  io = new IOServer(httpServer);
+  io = new IOServer<ClientToServerEvents, ServerToClientEvents>(httpServer);
   registerSocketHandlers(io, {
     store: new GameStore(), db: pool,
     getQuizForPlay, createGame, createPlayer, recordAnswer, setPlayerScore, setGameStatus,
+    finalizeGame,
     now: () => now,
   });
   await new Promise<void>((r) => httpServer.listen(() => r()));
@@ -165,6 +167,76 @@ describe("socket flow", () => {
     await new Promise((r) => setTimeout(r, 150));
 
     expect(overEvents.length).toBe(1);
+
+    host.close(); playerA.close(); playerB.close();
+  });
+
+  it("resolves the question via the server-side timer when a player never answers", async () => {
+    // Regression test for the deadlock bug: without a server-side timer, a
+    // question only ever resolves once every player has answered. If one
+    // player is slow or never submits, the round (and the whole game) hangs
+    // forever. This uses a 1-second time limit and REAL wall-clock time
+    // (not the injected `now()`, which only drives scoring) to prove the
+    // server force-resolves the round on expiry.
+    const quizId = await createQuiz(pool, {
+      title: "Timer quiz",
+      questions: [
+        {
+          text: "Capital of France?", time_limit_seconds: 1, points_base: 1000,
+          options: [
+            { text: "Paris", is_correct: true }, { text: "London", is_correct: false },
+            { text: "Rome", is_correct: false }, { text: "Berlin", is_correct: false },
+          ],
+        },
+      ],
+    });
+
+    const host = connect();
+    await once(host, "connect");
+    const created = await emitAck<{ gameId: string; joinCode: string }>(
+      host, "host:create-game", { quizId }
+    );
+    host.emit("host:join-room", { gameId: created.gameId });
+
+    const playerA = connect();
+    const playerB = connect();
+    await Promise.all([once(playerA, "connect"), once(playerB, "connect")]);
+
+    const joinedA = await emitAck<{ playerId: string; gameId: string; nickname: string }>(
+      playerA, "player:join", { joinCode: created.joinCode, nickname: "Alex" }
+    );
+    await emitAck<{ playerId: string; gameId: string; nickname: string }>(
+      playerB, "player:join", { joinCode: created.joinCode, nickname: "Sam" }
+    );
+
+    let bAnswered = false;
+    playerB.on("player:result", () => { bAnswered = true; });
+
+    const questionPromiseA = once<{ id: string; options: { id: string }[] }>(playerA, "game:question");
+    const resultPromise = once<{ correct_option_id: string }>(host, "game:question-result");
+    const overPromise = once<{ leaderboard: { nickname: string; score: number }[] }>(host, "game:over");
+
+    const startedAt = Date.now();
+    host.emit("host:start", { gameId: created.gameId });
+    const questionA = await questionPromiseA;
+
+    // Only player A answers; player B (deliberately) never submits.
+    playerA.emit("player:submit", {
+      gameId: created.gameId, playerId: joinedA.playerId, optionId: questionA.options[0].id,
+    });
+    await once(playerA, "player:result");
+    expect(bAnswered).toBe(false);
+
+    // This would hang forever (and time out the test) without the
+    // server-side timer, since allAnswered() never becomes true.
+    const result = await resultPromise;
+    const elapsedMs = Date.now() - startedAt;
+    expect(elapsedMs).toBeGreaterThanOrEqual(900); // resolved by the ~1s timer, not instantly
+    expect(result.correct_option_id).toBeTruthy();
+
+    const over = await overPromise; // single-question quiz -> also ends the game, exactly once
+    expect(over.leaderboard.some((e) => e.nickname === "Alex")).toBe(true);
+    expect(bAnswered).toBe(false); // the round resolved without player B ever answering
 
     host.close(); playerA.close(); playerB.close();
   });

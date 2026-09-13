@@ -25,6 +25,7 @@ export function startQuestion(game: LiveGame, now: number): PublicQuestion {
   game.currentIndex = nextIndex;
   game.questionStartMs = now;
   game.answers = new Map();
+  game.questionResolved = false;
   const q = game.questions[game.currentIndex];
   return {
     id: q.id,
@@ -48,6 +49,7 @@ export function submitAnswer(
 ): PlayerResult | null {
   const q = currentQuestion(game);
   if (!q || game.questionStartMs === null) return null;
+  if (now - game.questionStartMs > q.time_limit_seconds * 1000) return null;
   if (!game.players.has(playerId)) return null;
   if (game.answers.has(playerId)) return null;
 
@@ -99,4 +101,16 @@ export function leaderboard(game: LiveGame): LeaderboardEntry[] {
 
 export function isLastQuestion(game: LiveGame): boolean {
   return game.currentIndex >= game.questions.length - 1;
+}
+
+/**
+ * Marks the current question as resolved, returning true the first time
+ * this is called for the question (i.e. the caller should proceed with
+ * revealing it) and false on any subsequent call (already resolved by
+ * another trigger — all-answered, the timer, or a disconnect).
+ */
+export function tryResolveQuestion(game: LiveGame): boolean {
+  if (game.questionResolved) return false;
+  game.questionResolved = true;
+  return true;
 }

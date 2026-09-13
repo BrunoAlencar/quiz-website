@@ -12,6 +12,15 @@ export interface LiveGame {
   questionStartMs: number | null;
   answers: Map<string, { optionId: string; isCorrect: boolean; points: number }>;
   status: "lobby" | "in_progress" | "ended";
+  /** Handle for the pending per-question timeout, if a question is in progress. */
+  questionTimer?: NodeJS.Timeout;
+  /**
+   * Guards against double-resolution of the current question: set to false
+   * when a question starts, and to true the moment it is revealed (whether
+   * triggered by all-answered, the timer, or a disconnect completing the
+   * round). Undefined/false means "not yet resolved".
+   */
+  questionResolved?: boolean;
 }
 
 export class GameStore {

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import pg from "pg";
 import { createQuiz, getQuiz, listQuizzes, updateQuiz, getQuizForPlay } from "@/server/repositories/quizzes";
-import { createGame, getGameByCode, setGameStatus } from "@/server/repositories/games";
+import { createGame, getGameByCode, setGameStatus, finalizeGame } from "@/server/repositories/games";
 import { createPlayer, listPlayers, setPlayerScore } from "@/server/repositories/players";
 import { recordAnswer } from "@/server/repositories/answers";
 
@@ -103,6 +103,48 @@ describe("games/players/answers repositories", () => {
     await setPlayerScore(pool, p.id, 740);
     const players = await listPlayers(pool, game.id);
     expect(players.map((x) => x.nickname)).toContain("Alex");
+  });
+
+  it("finalizeGame atomically persists scores and marks the game ended", async () => {
+    const quizId = await createQuiz(pool, sampleInput);
+    const game = await createGame(pool, quizId, "ABC238");
+    const p1 = await createPlayer(pool, game.id, "Alex");
+    const p2 = await createPlayer(pool, game.id, "Sam");
+    const endedAt = new Date();
+
+    await finalizeGame(
+      pool,
+      game.id,
+      [{ playerId: p1.id, score: 900 }, { playerId: p2.id, score: 400 }],
+      endedAt
+    );
+
+    const found = await getGameByCode(pool, "ABC238");
+    expect(found?.status).toBe("ended");
+
+    const scores = await pool.query("SELECT id, score FROM players WHERE game_id = $1", [game.id]);
+    const scoreById = new Map(scores.rows.map((r) => [r.id, r.score]));
+    expect(scoreById.get(p1.id)).toBe(900);
+    expect(scoreById.get(p2.id)).toBe(400);
+  });
+
+  it("rolls back finalizeGame entirely if the transaction fails partway through", async () => {
+    const quizId = await createQuiz(pool, sampleInput);
+    const game = await createGame(pool, quizId, "ABC239");
+    const p1 = await createPlayer(pool, game.id, "Alex");
+
+    // An invalid (non-UUID) game id makes the final UPDATE statement fail,
+    // after the player score UPDATE already ran earlier in the same
+    // transaction. Both must be rolled back.
+    await expect(
+      finalizeGame(pool, "not-a-uuid", [{ playerId: p1.id, score: 777 }], new Date())
+    ).rejects.toThrow();
+
+    const scores = await pool.query("SELECT id, score FROM players WHERE game_id = $1", [game.id]);
+    const scoreById = new Map(scores.rows.map((r) => [r.id, r.score]));
+    expect(scoreById.get(p1.id)).toBe(0); // score update rolled back
+    const found = await getGameByCode(pool, "ABC239");
+    expect(found?.status).toBe("lobby"); // status update rolled back
   });
 
   it("records an answer and enforces one per player/question", async () => {

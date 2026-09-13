@@ -89,6 +89,17 @@ describe("gameManager", () => {
     expect(currentQuestion(game)?.id).toBe("q1");
   });
 
+  it("accepts an answer submitted exactly at the time limit but rejects one after it", () => {
+    const { game } = makeGame();
+    addPlayer(game, "p1", "Alex");
+    addPlayer(game, "p2", "Sam");
+    startQuestion(game, 1000); // time_limit_seconds = 20 -> limit is 1000 + 20000
+    const atLimit = submitAnswer(game, "p1", "q0o0", 1000 + 20000);
+    expect(atLimit).not.toBeNull();
+    const afterLimit = submitAnswer(game, "p2", "q0o1", 1000 + 20001);
+    expect(afterLimit).toBeNull();
+  });
+
   it("returns null from submitAnswer when there is no active question", () => {
     const { game } = makeGame();
     addPlayer(game, "p1", "Alex");

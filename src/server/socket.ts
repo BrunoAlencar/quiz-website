@@ -1,9 +1,9 @@
-import type { Server as IOServer } from "socket.io";
+import type { Server } from "socket.io";
 import pg from "pg";
 import { GameStore, type LiveGame } from "@/server/gameState";
 import {
   addPlayer, startQuestion, submitAnswer, allAnswered,
-  leaderboard, distribution, isLastQuestion, currentQuestion,
+  leaderboard, distribution, isLastQuestion, currentQuestion, tryResolveQuestion,
 } from "@/server/gameManager";
 import { generateJoinCode } from "@/lib/joinCode";
 import type { ClientToServerEvents, ServerToClientEvents } from "@/types";
@@ -20,10 +20,21 @@ interface Deps {
   }) => Promise<void>;
   setPlayerScore: (db: pg.Pool, playerId: string, score: number) => Promise<void>;
   setGameStatus: (db: pg.Pool, gameId: string, status: string, endedAt?: Date) => Promise<void>;
+  finalizeGame: (
+    db: pg.Pool,
+    gameId: string,
+    scores: { playerId: string; score: number }[],
+    endedAt: Date
+  ) => Promise<void>;
   now: () => number;
 }
 
-export function registerSocketHandlers(io: IOServer, deps: Deps): void {
+const GENERIC_ERROR = "Something went wrong. Please try again.";
+
+export function registerSocketHandlers(
+  io: Server<ClientToServerEvents, ServerToClientEvents>,
+  deps: Deps
+): void {
   const { store, db, now } = deps;
 
   function emitAnsweredCount(game: LiveGame) {
@@ -33,17 +44,33 @@ export function registerSocketHandlers(io: IOServer, deps: Deps): void {
     });
   }
 
+  function clearQuestionTimer(game: LiveGame) {
+    if (game.questionTimer) {
+      clearTimeout(game.questionTimer);
+      game.questionTimer = undefined;
+    }
+  }
+
+  function scheduleQuestionTimer(game: LiveGame, timeLimitSeconds: number) {
+    clearQuestionTimer(game);
+    game.questionTimer = setTimeout(() => {
+      game.questionTimer = undefined;
+      resolveRound(game).catch(() => {
+        io.to(game.id).emit("game:error", { message: GENERIC_ERROR });
+      });
+    }, timeLimitSeconds * 1000);
+  }
+
   async function endGame(game: LiveGame) {
     if (game.status === "ended") return;
     game.status = "ended";
-    for (const p of game.players.values()) {
-      await deps.setPlayerScore(db, p.id, p.score);
-    }
-    await deps.setGameStatus(db, game.id, "ended", new Date());
+    clearQuestionTimer(game);
+    const scores = [...game.players.values()].map((p) => ({ playerId: p.id, score: p.score }));
+    await deps.finalizeGame(db, game.id, scores, new Date());
     io.to(game.id).emit("game:over", { leaderboard: leaderboard(game) });
   }
 
-  function revealAndMaybeAdvance(game: LiveGame) {
+  function revealQuestion(game: LiveGame) {
     const q = currentQuestion(game);
     if (!q) return;
     const correct = q.options.find((o) => o.is_correct)!;
@@ -52,6 +79,19 @@ export function registerSocketHandlers(io: IOServer, deps: Deps): void {
       distribution: distribution(game),
       leaderboard: leaderboard(game),
     });
+  }
+
+  /**
+   * The single reveal/advance path for a question, reached via all-answered,
+   * timer expiry, or a disconnect completing the round. Idempotent per
+   * question via tryResolveQuestion — whichever trigger wins runs this body
+   * exactly once.
+   */
+  async function resolveRound(game: LiveGame): Promise<void> {
+    clearQuestionTimer(game);
+    if (!tryResolveQuestion(game)) return;
+    revealQuestion(game);
+    if (isLastQuestion(game)) await endGame(game);
   }
 
   io.on("connection", (socket) => {
@@ -102,45 +142,59 @@ export function registerSocketHandlers(io: IOServer, deps: Deps): void {
     });
 
     socket.on("host:start", async ({ gameId }) => {
-      const game = store.get(gameId);
-      if (!game || game.status !== "lobby") return;
-      game.status = "in_progress";
-      await deps.setGameStatus(db, game.id, "in_progress");
-      const q = startQuestion(game, now());
-      io.to(game.id).emit("game:question", q);
-      emitAnsweredCount(game);
+      try {
+        const game = store.get(gameId);
+        if (!game || game.status !== "lobby") return;
+        game.status = "in_progress";
+        await deps.setGameStatus(db, game.id, "in_progress");
+        const q = startQuestion(game, now());
+        io.to(game.id).emit("game:question", q);
+        emitAnsweredCount(game);
+        scheduleQuestionTimer(game, q.time_limit_seconds);
+      } catch {
+        io.to(gameId).emit("game:error", { message: GENERIC_ERROR });
+      }
     });
 
     socket.on("host:next", async ({ gameId }) => {
-      const game = store.get(gameId);
-      if (!game || game.status !== "in_progress") return;
-      if (isLastQuestion(game)) { await endGame(game); return; }
-      const q = startQuestion(game, now());
-      io.to(game.id).emit("game:question", q);
-      emitAnsweredCount(game);
+      try {
+        const game = store.get(gameId);
+        if (!game || game.status !== "in_progress") return;
+        clearQuestionTimer(game);
+        if (isLastQuestion(game)) { await endGame(game); return; }
+        const q = startQuestion(game, now());
+        io.to(game.id).emit("game:question", q);
+        emitAnsweredCount(game);
+        scheduleQuestionTimer(game, q.time_limit_seconds);
+      } catch {
+        io.to(gameId).emit("game:error", { message: GENERIC_ERROR });
+      }
     });
 
     socket.on("player:submit", async ({ gameId, playerId, optionId }) => {
-      const game = store.get(gameId);
-      if (!game) return;
-      const q = currentQuestion(game);
-      const submittedAt = now();
-      const result = submitAnswer(game, playerId, optionId, submittedAt);
-      if (!result || !q) return;
-      // Capture round completion synchronously (before any await) so exactly one
-      // submission triggers the reveal/advance — avoids a double-fire race.
-      const completedRound = allAnswered(game);
-      await deps.recordAnswer(db, {
-        gameId: game.id, playerId, questionId: q.id, optionId,
-        isCorrect: result.is_correct,
-        responseMs: submittedAt - (game.questionStartMs ?? submittedAt),
-        pointsAwarded: result.points_awarded,
-      });
-      socket.emit("player:result", result);
-      emitAnsweredCount(game);
-      if (completedRound) {
-        revealAndMaybeAdvance(game);
-        if (isLastQuestion(game)) await endGame(game);
+      try {
+        const game = store.get(gameId);
+        if (!game) return;
+        const q = currentQuestion(game);
+        const submittedAt = now();
+        const result = submitAnswer(game, playerId, optionId, submittedAt);
+        if (!result || !q) return;
+        // Capture round completion synchronously (before any await) so exactly one
+        // submission triggers the reveal/advance — avoids a double-fire race.
+        const completedRound = allAnswered(game);
+        await deps.recordAnswer(db, {
+          gameId: game.id, playerId, questionId: q.id, optionId,
+          isCorrect: result.is_correct,
+          responseMs: submittedAt - (game.questionStartMs ?? submittedAt),
+          pointsAwarded: result.points_awarded,
+        });
+        socket.emit("player:result", result);
+        emitAnsweredCount(game);
+        if (completedRound) {
+          await resolveRound(game);
+        }
+      } catch {
+        io.to(gameId).emit("game:error", { message: GENERIC_ERROR });
       }
     });
 
@@ -163,6 +217,27 @@ export function registerSocketHandlers(io: IOServer, deps: Deps): void {
         }
       } else if (game.status === "ended") {
         socket.emit("game:over", { leaderboard: leaderboard(game) });
+      }
+    });
+
+    socket.on("disconnect", () => {
+      try {
+        const { playerId, gameId } = socket.data as { playerId?: string; gameId?: string };
+        if (!playerId || !gameId) return;
+        const game = store.get(gameId);
+        if (!game || !game.players.has(playerId)) return;
+        game.players.delete(playerId);
+        io.to(game.id).emit("lobby:players", {
+          players: [...game.players.values()].map((p) => ({ id: p.id, nickname: p.nickname })),
+        });
+        emitAnsweredCount(game);
+        if (game.status === "in_progress" && currentQuestion(game) && allAnswered(game)) {
+          resolveRound(game).catch(() => {
+            io.to(game.id).emit("game:error", { message: GENERIC_ERROR });
+          });
+        }
+      } catch {
+        // best-effort cleanup; the socket is already gone so there is nowhere to report to
       }
     });
   });
