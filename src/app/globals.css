@@ -1,0 +1,10 @@
+:root {
+  --red: #e21b3c; --blue: #1368ce; --yellow: #d89e00; --green: #26890c;
+  --bg: #0f1020; --fg: #ffffff;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+button { font: inherit; cursor: pointer; }
+.container { max-width: 900px; margin: 0 auto; padding: 24px; }
+.card { background: #1b1c33; border-radius: 12px; padding: 20px; }
+input { padding: 12px; border-radius: 8px; border: 1px solid #333; width: 100%; }
