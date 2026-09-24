@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
+import { ANSWER_SHAPES } from "@/components/AnswerButton";
 
 interface EditOption { text: string; is_correct: boolean; }
 interface EditQuestion { text: string; time_limit_seconds: number; points_base: number; options: EditOption[]; }
@@ -78,38 +80,68 @@ export default function QuizEditor() {
   }
 
   return (
-    <main className="container">
-      <h1>Edit quiz</h1>
-      <div className="card" style={{ marginBottom: 16 }}>
-        <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <input placeholder="Description" value={description}
-          onChange={(e) => setDescription(e.target.value)} style={{ marginTop: 8 }} />
+    <main className="screen screen--wide">
+      <div className="row-between">
+        <h1>Edit quiz</h1>
+        <Link className="link" href="/admin">← All quizzes</Link>
+      </div>
+
+      <div className="card stack">
+        <label className="field">
+          <span>Title</span>
+          <input placeholder="Quiz title" value={title} onChange={(e) => setTitle(e.target.value)} />
+        </label>
+        <label className="field">
+          <span>Description</span>
+          <input placeholder="A short summary (optional)" value={description}
+            onChange={(e) => setDescription(e.target.value)} />
+        </label>
       </div>
 
       {questions.map((q, qi) => (
-        <div className="card" key={qi} style={{ marginBottom: 16 }}>
-          <input placeholder="Question text" value={q.text}
-            onChange={(e) => updateQuestion(qi, { text: e.target.value })} />
-          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-            <input type="number" min={1} value={q.time_limit_seconds}
-              onChange={(e) => updateQuestion(qi, { time_limit_seconds: Number(e.target.value) })} />
-            <input type="number" min={1} value={q.points_base}
-              onChange={(e) => updateQuestion(qi, { points_base: Number(e.target.value) })} />
+        <div className="card stack" key={qi}>
+          <div className="row-between">
+            <h3>Question {qi + 1}</h3>
+            <button className="btn btn-danger btn-sm" onClick={() => removeQuestion(qi)}>Remove</button>
           </div>
-          {q.options.map((o, oi) => (
-            <div key={oi} style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
-              <input type="radio" name={`correct-${qi}`} checked={o.is_correct}
-                onChange={() => setCorrect(qi, oi)} />
-              <input value={o.text} onChange={(e) => updateOption(qi, oi, { text: e.target.value })} />
-            </div>
-          ))}
-          <button onClick={() => removeQuestion(qi)} style={{ marginTop: 8 }}>Remove question</button>
+          <label className="field">
+            <span>Question text</span>
+            <input placeholder="What do you want to ask?" value={q.text}
+              onChange={(e) => updateQuestion(qi, { text: e.target.value })} />
+          </label>
+          <div className="field-row">
+            <label className="field">
+              <span>Time limit (seconds)</span>
+              <input type="number" min={1} value={q.time_limit_seconds}
+                onChange={(e) => updateQuestion(qi, { time_limit_seconds: Number(e.target.value) })} />
+            </label>
+            <label className="field">
+              <span>Points</span>
+              <input type="number" min={1} value={q.points_base}
+                onChange={(e) => updateQuestion(qi, { points_base: Number(e.target.value) })} />
+            </label>
+          </div>
+          <div className="stack-sm">
+            <span className="field"><span>Answers — select the correct one</span></span>
+            {q.options.map((o, oi) => (
+              <div key={oi} className={`opt opt-${oi}${o.is_correct ? " is-correct" : ""}`}>
+                <input type="radio" name={`correct-${qi}`} checked={o.is_correct}
+                  onChange={() => setCorrect(qi, oi)}
+                  aria-label={`Mark answer ${oi + 1} as correct`} />
+                <span className="opt-shape" aria-hidden="true">{ANSWER_SHAPES[oi]}</span>
+                <input className="opt-text" placeholder={`Answer ${oi + 1}`} value={o.text}
+                  onChange={(e) => updateOption(qi, oi, { text: e.target.value })} />
+              </div>
+            ))}
+          </div>
         </div>
       ))}
 
-      <button onClick={addQuestion}>+ Add question</button>{" "}
-      <button onClick={save}>Save</button>
-      {message && <p>{message}</p>}
+      <div className="btn-row">
+        <button className="btn" onClick={addQuestion}>Add question</button>
+        <button className="btn btn-primary" onClick={save}>Save quiz</button>
+      </div>
+      {message && <p className={message === "Saved" ? "notice" : "error"}>{message}</p>}
     </main>
   );
 }

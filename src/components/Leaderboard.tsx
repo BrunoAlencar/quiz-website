@@ -2,16 +2,15 @@ import type { LeaderboardEntry } from "@/types";
 
 export function Leaderboard({ entries, highlightId }: { entries: LeaderboardEntry[]; highlightId?: string }) {
   return (
-    <ol style={{ listStyle: "none", padding: 0 }}>
+    <ol className="board">
       {entries.map((e) => (
-        <li key={e.player_id}
-          style={{
-            display: "flex", justifyContent: "space-between", padding: "10px 14px",
-            marginBottom: 6, borderRadius: 8,
-            background: e.player_id === highlightId ? "var(--blue)" : "#2a2b47",
-          }}>
-          <span>{e.rank}. {e.nickname}</span>
-          <span>{e.score}</span>
+        <li
+          key={e.player_id}
+          className={`${e.rank <= 3 ? `top${e.rank}` : ""}${e.player_id === highlightId ? " me" : ""}`}
+        >
+          <span className="rank">{e.rank}</span>
+          <span className="who">{e.nickname}</span>
+          <span className="score">{e.score}</span>
         </li>
       ))}
     </ol>

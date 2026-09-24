@@ -24,15 +24,36 @@ function JoinInner() {
   }
 
   return (
-    <main className="container">
-      <h1>Join the game</h1>
-      <form onSubmit={join} className="card">
-        <input placeholder="Game code" value={code}
-          onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={6} />
-        <input placeholder="Your name" value={nickname}
-          onChange={(e) => setNickname(e.target.value)} style={{ marginTop: 8 }} />
-        {error && <p style={{ color: "var(--red)" }}>{error}</p>}
-        <button type="submit" style={{ marginTop: 12 }}>Enter</button>
+    <main className="screen screen--narrow">
+      <div className="stack">
+        <div className="shapes small" aria-hidden="true">
+          <i className="s0">▲</i><i className="s1">◆</i><i className="s2">●</i><i className="s3">■</i>
+        </div>
+        <h1>Join the game</h1>
+        <p className="tagline">Enter the code shown on the host&rsquo;s screen.</p>
+      </div>
+
+      <form onSubmit={join} className="card stack">
+        <label className="field">
+          <span>Game code</span>
+          <input
+            placeholder="ABC123"
+            value={code}
+            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            maxLength={6}
+            autoCapitalize="characters"
+            autoComplete="off"
+            autoFocus
+            style={{ textTransform: "uppercase", letterSpacing: "0.3em", fontSize: "1.4rem", fontWeight: 700, textAlign: "center" }}
+          />
+        </label>
+        <label className="field">
+          <span>Your name</span>
+          <input placeholder="e.g. Bruno" value={nickname} maxLength={20}
+            onChange={(e) => setNickname(e.target.value)} />
+        </label>
+        {error && <p className="error">{error}</p>}
+        <button type="submit" className="btn btn-primary btn-lg btn-block">Enter game</button>
       </form>
     </main>
   );

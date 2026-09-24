@@ -1,24 +1,27 @@
 "use client";
-const COLORS = ["var(--red)", "var(--blue)", "var(--yellow)", "var(--green)"];
-const SHAPES = ["▲", "◆", "●", "■"];
+export const ANSWER_SHAPES = ["▲", "◆", "●", "■"];
+const SHAPES = ANSWER_SHAPES;
 
 export function AnswerButton({
-  index, text, onClick, disabled, dimmed,
+  index, text, onClick, disabled, dimmed, selected,
 }: {
-  index: number; text: string; onClick?: () => void; disabled?: boolean; dimmed?: boolean;
+  index: number;
+  text: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  dimmed?: boolean;
+  selected?: boolean;
 }) {
+  const tone = index % 4;
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={disabled}
-      style={{
-        background: COLORS[index % 4], color: "#fff", border: "none", borderRadius: 12,
-        padding: "24px 16px", fontSize: 20, width: "100%", opacity: dimmed ? 0.35 : 1,
-        display: "flex", gap: 12, alignItems: "center",
-      }}
+      className={`answer answer-${tone}${selected ? " is-selected" : ""}${dimmed ? " is-dimmed" : ""}`}
     >
-      <span style={{ fontSize: 24 }}>{SHAPES[index % 4]}</span>
-      <span>{text}</span>
+      <span className="answer-shape" aria-hidden="true">{SHAPES[tone]}</span>
+      <span className="answer-text">{text}</span>
     </button>
   );
 }
