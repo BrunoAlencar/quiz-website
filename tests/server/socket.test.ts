@@ -50,7 +50,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  io.close(); httpServer.close(); await pool.end();
+  // Guard against a failed beforeAll (e.g. missing DATABASE_URL_TEST): io and
+  // httpServer may never have been assigned, so don't assume they exist.
+  io?.close(); httpServer?.close(); await pool.end();
 });
 
 beforeEach(async () => {
