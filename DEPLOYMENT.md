@@ -81,16 +81,18 @@ at the Elastic IP). There is no HTTP fallback.
    extra Traefik config is required. This app runs a single instance, so no
    sticky-session / Redis adapter is needed.
 
-## Optional: seed the sample quiz
+## Optional: seed a quiz
 
-To load the Ireland sample quiz into the production DB, run once via the
-Application's container terminal (Coolify → Application → Terminal):
+To load a quiz into the production DB, run once via the Application's container
+terminal (Coolify → Application → Terminal). `DATABASE_URL` is already in the
+container's environment, so the npm scripts work as-is:
 
 ```bash
-npx tsx db/seed-ireland.ts
+npm run seed:styleguide   # "Styleguide QueroDelivery" — 15 questions
 ```
 
-(`DATABASE_URL` is already in the container's environment.)
+Re-running the script inserts a **new** copy of the quiz, so run it only once
+per environment.
 
 ## Redeploying after changes
 
