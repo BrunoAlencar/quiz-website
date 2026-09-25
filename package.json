@@ -9,6 +9,7 @@
     "start": "NODE_ENV=production tsx server.ts",
     "migrate": "tsx db/migrate.ts",
     "seed:styleguide": "tsx db/seed-styleguide.ts",
+    "seed:kafka-partitions": "tsx db/seed-kafka-partitions.ts",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
