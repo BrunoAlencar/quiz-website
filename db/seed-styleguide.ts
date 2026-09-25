@@ -3,6 +3,16 @@ import { createQuiz } from "@/server/repositories/quizzes";
 import { validateQuizInput } from "@/lib/validation";
 import type { QuizInput } from "@/types";
 
+// Fisher-Yates shuffle so the correct option is not always the first slot.
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 const q = (
   text: string,
   correct: string,
@@ -11,18 +21,18 @@ const q = (
   text,
   time_limit_seconds: 20,
   points_base: 1000,
-  options: [
+  options: shuffle([
     { text: correct, is_correct: true },
     { text: wrong[0], is_correct: false },
     { text: wrong[1], is_correct: false },
     { text: wrong[2], is_correct: false },
-  ],
+  ]),
 });
 
 const quiz: QuizInput = {
   title: "Styleguide QueroDelivery",
   description:
-    "15 perguntas sobre o guia de estilo JavaScript/TypeScript da QueroDelivery: interfaces, imports, rotas, Kafka e mais.",
+    "25 perguntas sobre o guia de estilo JavaScript/TypeScript da QueroDelivery: interfaces, imports, rotas, Kafka, tempo de resposta e mais.",
   questions: [
     q(
       "Como deve ser nomeada uma interface segundo o styleguide?",
@@ -150,6 +160,80 @@ const quiz: QuizInput = {
       "Segundo a tabela de tempo de resposta, qual latência ponta a ponta é classificada como 'Ruim'?",
       "Acima de 500ms",
       ["Abaixo de 100ms", "Entre 100ms e 300ms", "Entre 300ms e 500ms"],
+    ),
+    q(
+      "Qual guia de estilo é usado como base para o styleguide da QueroDelivery?",
+      "O Airbnb JavaScript Style Guide",
+      [
+        "O Google JavaScript Style Guide",
+        "O StandardJS",
+        "O guia de estilo oficial do TypeScript",
+      ],
+    ),
+    q(
+      "Na parte SERVICE do nome de um tópico Kafka, como nomes compostos devem ser escritos?",
+      "Em maiúsculas e separados por hífen, ex.: QD-PRODUCTS-SERVICE",
+      [
+        "Em maiúsculas separados por underscore, ex.: QD_PRODUCTS_SERVICE",
+        "Em camelCase, ex.: qdProductsService",
+        "Em minúsculas separados por ponto, ex.: qd.products.service",
+      ],
+    ),
+    q(
+      "Como a parte ENTITY do nome de um tópico Kafka deve ser escrita?",
+      "Em maiúsculas, separando por hífen quando composta, ex.: SHOPPING-CART",
+      [
+        "Em minúsculas, ex.: shopping-cart",
+        "Em PascalCase, ex.: ShoppingCart",
+        "Em maiúsculas separada por underscore, ex.: SHOPPING_CART",
+      ],
+    ),
+    q(
+      "Na tabela de tempo de resposta, como é classificada uma latência abaixo de 100ms?",
+      "Excelente",
+      ["Bom", "Degradando", "Ruim"],
+    ),
+    q(
+      "Na tabela de tempo de resposta, como é classificada uma latência entre 100ms e 300ms?",
+      "Bom",
+      ["Excelente", "Degradando", "Ruim"],
+    ),
+    q(
+      "Na tabela de tempo de resposta, como é classificada uma latência entre 300ms e 500ms?",
+      "Degradando",
+      ["Bom", "Excelente", "Ruim"],
+    ),
+    q(
+      "Qual limite endpoints de conteúdo above-the-fold nunca devem ultrapassar?",
+      "500ms",
+      ["100ms", "300ms", "1000ms"],
+    ),
+    q(
+      "Os valores de referência de tempo de resposta representam qual latência?",
+      "A latência ponta a ponta percebida pelo usuário (usuário → frontend → BFF → serviço)",
+      [
+        "A latência isolada de cada serviço interno",
+        "Apenas o tempo de processamento do banco de dados",
+        "Apenas a latência de rede entre o BFF e o serviço",
+      ],
+    ),
+    q(
+      "Segundo a FAQ, devemos ter obrigatoriamente um tópico Kafka por domínio?",
+      "Não necessariamente; preferimos tópicos genéricos por domínio, com exceções bem justificadas",
+      [
+        "Sim, sempre um tópico dedicado por domínio",
+        "Sim, e também um tópico por status de cada entidade",
+        "Não, devemos usar um único tópico global para tudo",
+      ],
+    ),
+    q(
+      "Segundo a FAQ, o que fazer quando já existe um producer publicando em um tópico específico de status?",
+      "Depreciar o tópico específico e passar a publicar no tópico genérico",
+      [
+        "Manter o tópico específico e criar um novo genérico em paralelo",
+        "Criar tópicos adicionais para migrar 'no futuro'",
+        "Duplicar as mensagens em ambos os tópicos permanentemente",
+      ],
     ),
   ],
 };
