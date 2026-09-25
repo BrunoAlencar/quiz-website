@@ -1,0 +1,20 @@
+# Reinstalled / rebuilt inside the image
+node_modules
+.next
+*.tsbuildinfo
+
+# Secrets — production env comes from Coolify, never from a baked-in .env
+.env
+.env.local
+
+# VCS and local tooling
+.git
+.gitignore
+.claude
+.superpowers
+
+# Not needed at build/runtime
+tests
+docs
+*.log
+.DS_Store
