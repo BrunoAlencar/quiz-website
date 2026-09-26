@@ -86,12 +86,17 @@ export function registerSocketHandlers(
    * timer expiry, or a disconnect completing the round. Idempotent per
    * question via tryResolveQuestion — whichever trigger wins runs this body
    * exactly once.
+   *
+   * Even on the last question we only reveal here; the game is not ended
+   * automatically. This keeps the host on the reveal screen (question text +
+   * answer distribution + leaderboard) for the final question too, matching
+   * every other round. The host advances to the final results explicitly via
+   * `host:next`, which ends the game.
    */
   async function resolveRound(game: LiveGame): Promise<void> {
     clearQuestionTimer(game);
     if (!tryResolveQuestion(game)) return;
     revealQuestion(game);
-    if (isLastQuestion(game)) await endGame(game);
   }
 
   io.on("connection", (socket) => {

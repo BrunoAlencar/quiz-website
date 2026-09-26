@@ -99,6 +99,7 @@ describe("socket flow", () => {
 
     now = 2000; // 2s to answer
     const resultPromise = once<{ is_correct: boolean; points_awarded: number }>(player, "player:result");
+    const revealPromise = once<{ correct_option_id: string }>(host, "game:question-result");
     const overPromise = once<{ leaderboard: { nickname: string; score: number }[] }>(host, "game:over");
     // pick the correct option by matching text via the public question is not possible (no is_correct);
     // the server knows correctness. Submit the first option; then assert result shape.
@@ -108,14 +109,20 @@ describe("socket flow", () => {
     const result = await resultPromise;
     expect(typeof result.points_awarded).toBe("number");
 
-    // last question -> game over after all answered
+    // last question -> the round is revealed (host stays on the answers screen),
+    // but the game does NOT end automatically.
+    const reveal = await revealPromise;
+    expect(reveal.correct_option_id).toBeTruthy();
+
+    // host advances explicitly to the final results.
+    host.emit("host:next", { gameId: created.gameId });
     const over = await overPromise;
     expect(over.leaderboard[0].nickname).toBe("Alex");
 
     host.close(); player.close();
   });
 
-  it("fires game:over exactly once when two players submit near-simultaneously", async () => {
+  it("reveals the round exactly once when two players submit near-simultaneously", async () => {
     const quizId = await createQuiz(pool, sampleInput);
 
     const host = connect();
@@ -125,8 +132,8 @@ describe("socket flow", () => {
     );
     host.emit("host:join-room", { gameId: created.gameId });
 
-    const overEvents: unknown[] = [];
-    host.on("game:over", (payload) => { overEvents.push(payload); });
+    const revealEvents: unknown[] = [];
+    host.on("game:question-result", (payload) => { revealEvents.push(payload); });
 
     const playerA = connect();
     const playerB = connect();
@@ -150,7 +157,7 @@ describe("socket flow", () => {
     const resultPromiseB = once<{ is_correct: boolean }>(playerB, "player:result");
     // Registered before either submit fires, so we can't miss the event by
     // attaching the listener too late.
-    const firstOverPromise = once(host, "game:over");
+    const firstRevealPromise = once(host, "game:question-result");
 
     // Emit both submissions back-to-back without awaiting between them, so the
     // synchronous portions of both handlers race before either await resolves.
@@ -163,12 +170,12 @@ describe("socket flow", () => {
 
     await Promise.all([resultPromiseA, resultPromiseB]);
 
-    // Wait for the first game:over, then give a real-time window for a
+    // Wait for the first reveal, then give a real-time window for a
     // potential second (buggy, duplicate) emission to arrive.
-    await firstOverPromise;
+    await firstRevealPromise;
     await new Promise((r) => setTimeout(r, 150));
 
-    expect(overEvents.length).toBe(1);
+    expect(revealEvents.length).toBe(1);
 
     host.close(); playerA.close(); playerB.close();
   });
@@ -235,10 +242,12 @@ describe("socket flow", () => {
     const elapsedMs = Date.now() - startedAt;
     expect(elapsedMs).toBeGreaterThanOrEqual(900); // resolved by the ~1s timer, not instantly
     expect(result.correct_option_id).toBeTruthy();
-
-    const over = await overPromise; // single-question quiz -> also ends the game, exactly once
-    expect(over.leaderboard.some((e) => e.nickname === "Alex")).toBe(true);
     expect(bAnswered).toBe(false); // the round resolved without player B ever answering
+
+    // The last question stays on the reveal screen; the host ends the game explicitly.
+    host.emit("host:next", { gameId: created.gameId });
+    const over = await overPromise;
+    expect(over.leaderboard.some((e) => e.nickname === "Alex")).toBe(true);
 
     host.close(); playerA.close(); playerB.close();
   });
