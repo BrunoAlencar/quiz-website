@@ -144,7 +144,10 @@ export default function HostPage() {
     const maxCount = Math.max(1, ...question.options.map((o) => distribution[o.id] ?? 0));
     return (
       <main className="screen screen--wide">
-        <h1>Answers</h1>
+        <div className="stage-top">
+          <span className="progress">Question {question.index + 1} / {question.total}</span>
+        </div>
+        <h1 className="question">{question.text}</h1>
         <div className="answers-static">
           {question.options.map((o, i) => {
             const count = distribution[o.id] ?? 0;
@@ -166,7 +169,9 @@ export default function HostPage() {
           <h2>Leaderboard</h2>
           <Leaderboard entries={board.slice(0, 5)} />
         </div>
-        <button className="btn btn-primary btn-lg" onClick={next}>Next</button>
+        <button className="btn btn-primary btn-lg" onClick={next}>
+          {question.index + 1 >= question.total ? "Final results →" : "Next"}
+        </button>
       </main>
     );
   }
