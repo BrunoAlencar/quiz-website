@@ -1001,6 +1001,501 @@ const systemDesignHardQuiz: QuizInput = {
   ],
 };
 
+// ---------------------------------------------------------------------------
+// Sistemas Distribuídos (Fácil)
+// ---------------------------------------------------------------------------
+const distributedSystemsEasyQuiz: QuizInput = {
+  title: "Sistemas Distribuídos: Fundamentos (Fácil)",
+  description:
+    "15 perguntas de nível fácil sobre sistemas distribuídos: nós, replicação, tolerância a falhas, partição de rede e mais.",
+  questions: [
+    q(
+      "O que é um sistema distribuído?",
+      "Um conjunto de computadores que trabalham juntos aparecendo como um só sistema",
+      [
+        "Um único computador que executa vários programas",
+        "Um programa que roda apenas no navegador",
+        "Um banco de dados armazenado em um só disco",
+      ],
+    ),
+    q(
+      "O que é um \"nó\" (node) em um sistema distribuído?",
+      "Um computador ou processo individual que faz parte do sistema",
+      [
+        "Um erro de comunicação entre servidores",
+        "Uma tabela dentro do banco de dados",
+        "Uma requisição enviada pelo cliente",
+      ],
+    ),
+    q(
+      "Por que usar um sistema distribuído em vez de um único servidor?",
+      "Para obter maior escalabilidade e tolerância a falhas",
+      [
+        "Para reduzir a quantidade de código escrito",
+        "Para eliminar totalmente a necessidade de rede",
+        "Para impedir o acesso de múltiplos usuários",
+      ],
+    ),
+    q(
+      "O que é tolerância a falhas (fault tolerance)?",
+      "A capacidade do sistema continuar funcionando mesmo com falhas de componentes",
+      [
+        "A garantia de que nenhuma falha jamais ocorrerá",
+        "A remoção de todos os logs de erro",
+        "A execução do sistema em um único nó",
+      ],
+    ),
+    q(
+      "O que é um timeout em uma chamada entre nós?",
+      "Um limite de tempo de espera após o qual a chamada é considerada falha",
+      [
+        "Um erro de sintaxe no código do nó",
+        "Um backup automático feito entre os nós",
+        "Um índice criado para acelerar as consultas",
+      ],
+    ),
+    q(
+      "O que significa \"alta disponibilidade\" (high availability)?",
+      "O sistema permanece acessível na maior parte do tempo, com pouca indisponibilidade",
+      [
+        "O sistema responde sempre com dados criptografados",
+        "O sistema só funciona em horário comercial",
+        "O sistema roda em um único servidor potente",
+      ],
+    ),
+    q(
+      "O que é replicação de dados?",
+      "Manter cópias dos mesmos dados em vários nós",
+      [
+        "Apagar dados duplicados do banco",
+        "Comprimir os dados em um único arquivo",
+        "Mover os dados para um disco mais rápido",
+      ],
+    ),
+    q(
+      "Por que replicar dados em vários nós?",
+      "Para aumentar a disponibilidade e a tolerância a falhas",
+      [
+        "Para reduzir o espaço total em disco",
+        "Para impedir a leitura dos dados",
+        "Para desativar o cache do sistema",
+      ],
+    ),
+    q(
+      "O que é escalabilidade horizontal?",
+      "Adicionar mais máquinas para lidar com mais carga",
+      [
+        "Adicionar mais memória a uma única máquina",
+        "Reduzir o número de servidores ativos",
+        "Trocar o banco relacional por um em memória",
+      ],
+    ),
+    q(
+      "O que é latência de rede?",
+      "O tempo que uma mensagem leva para trafegar entre dois nós",
+      [
+        "A quantidade de nós no sistema",
+        "O espaço em disco de cada nó",
+        "O número de falhas por dia",
+      ],
+    ),
+    q(
+      "O que é um ponto único de falha (single point of failure)?",
+      "Um componente cuja falha derruba todo o sistema",
+      [
+        "Um nó extra usado apenas para backup",
+        "Um erro que ocorre uma única vez",
+        "Um componente que nunca pode falhar",
+      ],
+    ),
+    q(
+      "O que é comunicação assíncrona entre serviços?",
+      "Os serviços trocam mensagens sem esperar uma resposta imediata",
+      [
+        "Os serviços só se comunicam por arquivos locais",
+        "Um serviço bloqueia até o outro responder sempre",
+        "Os serviços compartilham a mesma memória",
+      ],
+    ),
+    q(
+      "O que é um heartbeat em sistemas distribuídos?",
+      "Um sinal periódico que indica que um nó está vivo e saudável",
+      [
+        "Um backup completo feito a cada hora",
+        "Uma mensagem de erro enviada ao cliente",
+        "Um índice criado automaticamente no banco",
+      ],
+    ),
+    q(
+      "O que é consistência de dados em um sistema distribuído?",
+      "Garantir que todos os nós enxerguem os mesmos dados",
+      [
+        "Garantir que cada nó tenha dados diferentes",
+        "Apagar os dados antigos periodicamente",
+        "Criptografar os dados em cada nó",
+      ],
+    ),
+    q(
+      "O que é um cluster?",
+      "Um grupo de nós que trabalham juntos como uma única unidade",
+      [
+        "Um único servidor isolado da rede",
+        "Um tipo de índice de banco de dados",
+        "Um arquivo de configuração do sistema",
+      ],
+    ),
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// Event Sourcing
+// ---------------------------------------------------------------------------
+const eventSourcingQuiz: QuizInput = {
+  title: "Event Sourcing: Fundamentos",
+  description:
+    "15 perguntas sobre Event Sourcing: eventos imutáveis, event store, snapshots, projeções e a relação com CQRS.",
+  questions: [
+    q(
+      "O que é Event Sourcing?",
+      "Um padrão que armazena o estado como uma sequência de eventos imutáveis",
+      [
+        "Um padrão que guarda apenas o estado atual, sem histórico",
+        "Uma técnica de compressão de banco de dados",
+        "Um protocolo de comunicação entre serviços",
+      ],
+    ),
+    q(
+      "No Event Sourcing, qual é a fonte da verdade (source of truth)?",
+      "O log de eventos (event store)",
+      [
+        "A última linha da tabela de estado",
+        "O cache em memória do serviço",
+        "O arquivo de configuração da aplicação",
+      ],
+    ),
+    q(
+      "Como o estado atual é obtido no Event Sourcing?",
+      "Reproduzindo (replay) os eventos desde o início",
+      [
+        "Lendo uma única coluna de status",
+        "Consultando um cache que nunca expira",
+        "Somando todos os registros de log de erro",
+      ],
+    ),
+    q(
+      "O que caracteriza um evento no Event Sourcing?",
+      "Um fato imutável que já aconteceu no passado",
+      [
+        "Uma intenção de mudança ainda não confirmada",
+        "Um comando que pode ser cancelado a qualquer momento",
+        "Uma consulta de leitura ao banco de dados",
+      ],
+    ),
+    q(
+      "Por que os eventos são imutáveis?",
+      "Porque representam fatos que já ocorreram e não podem ser alterados",
+      [
+        "Porque ocupam menos espaço em disco",
+        "Porque são criptografados por padrão",
+        "Porque só existem em memória temporária",
+      ],
+    ),
+    q(
+      "O que é um \"event store\"?",
+      "Um armazenamento append-only que guarda todos os eventos",
+      [
+        "Um cache que guarda apenas o estado atual",
+        "Uma fila que descarta eventos antigos",
+        "Um índice para acelerar consultas relacionais",
+      ],
+    ),
+    q(
+      "O que significa \"append-only\" no contexto de Event Sourcing?",
+      "Só é possível adicionar novos eventos, nunca alterar ou remover os existentes",
+      [
+        "Os eventos podem ser editados a qualquer momento",
+        "Apenas o último evento pode ser mantido",
+        "Os eventos são sobrescritos a cada atualização",
+      ],
+    ),
+    q(
+      "O que é um \"snapshot\" no Event Sourcing?",
+      "Uma captura do estado em um ponto para evitar reprocessar todos os eventos",
+      [
+        "Uma cópia de segurança do código-fonte",
+        "Um evento que apaga o histórico anterior",
+        "Uma foto da interface do usuário",
+      ],
+    ),
+    q(
+      "Qual é a vantagem de ter um histórico completo de eventos?",
+      "Permite auditoria e reconstruir o estado em qualquer ponto no tempo",
+      [
+        "Reduz o espaço em disco necessário",
+        "Elimina a necessidade de qualquer banco de dados",
+        "Impede a leitura concorrente dos dados",
+      ],
+    ),
+    q(
+      "O que é uma \"projection\" (projeção) no Event Sourcing?",
+      "Uma visão de leitura derivada da reprodução dos eventos",
+      [
+        "Um evento agendado para o futuro",
+        "Uma cópia criptografada do event store",
+        "Um comando que altera o estado diretamente",
+      ],
+    ),
+    q(
+      "Qual padrão é comumente usado em conjunto com Event Sourcing?",
+      "CQRS (Command Query Responsibility Segregation)",
+      ["MVC (Model-View-Controller)", "REST", "Singleton"],
+    ),
+    q(
+      "O que o CQRS separa?",
+      "As operações de escrita (commands) das de leitura (queries)",
+      [
+        "O frontend do backend",
+        "O banco de dados do sistema de arquivos",
+        "Os usuários administradores dos comuns",
+      ],
+    ),
+    q(
+      "Como se corrige um erro no Event Sourcing, já que os eventos são imutáveis?",
+      "Adicionando um novo evento compensatório ou corretivo",
+      [
+        "Editando o evento incorreto diretamente",
+        "Apagando o evento errado do event store",
+        "Reiniciando o serviço para limpar o histórico",
+      ],
+    ),
+    q(
+      "Como os nomes dos eventos costumam ser escritos?",
+      "No passado, descrevendo algo que já ocorreu (ex.: PedidoCriado)",
+      [
+        "No imperativo, como uma ordem (ex.: CriarPedido)",
+        "Como perguntas (ex.: PedidoExiste?)",
+        "Apenas com números sequenciais",
+      ],
+    ),
+    q(
+      "Qual é uma desvantagem do Event Sourcing?",
+      "Maior complexidade e o custo de reprocessar muitos eventos",
+      [
+        "A impossibilidade de auditar o sistema",
+        "A perda total do histórico de mudanças",
+        "A incapacidade de escalar horizontalmente",
+      ],
+    ),
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// Quero Delivery — Roadmap do Engenheiro de Software
+// ---------------------------------------------------------------------------
+const qdRoadmapQuiz: QuizInput = {
+  title: "Quero Delivery: Roadmap do Engenheiro de Software",
+  description:
+    "15 perguntas sobre o roadmap de engenharia da Quero Delivery: stack, padrões de código, mensageria, arquitetura e práticas de time.",
+  questions: [
+    q(
+      "Qual framework web é usado nos backends modernos da Quero Delivery?",
+      "Express",
+      ["NestJS", "Fastify", "Koa"],
+    ),
+    q(
+      "Qual é o banco de dados principal dos serviços da Quero Delivery?",
+      "MongoDB com Mongoose",
+      [
+        "PostgreSQL com Prisma",
+        "MySQL com Sequelize",
+        "DynamoDB com TypeORM",
+      ],
+    ),
+    q(
+      "Qual tecnologia de mensageria é usada nos microserviços modernos da QD?",
+      "Kafka",
+      ["RabbitMQ", "Amazon SQS", "Redis Streams"],
+    ),
+    q(
+      "Qual tecnologia é usada para cache nos serviços da Quero Delivery?",
+      "Redis (via ioredis)",
+      ["Memcached", "Hazelcast", "Ehcache"],
+    ),
+    q(
+      "Qual abordagem de APIs a Quero Delivery adota?",
+      "REST com OpenAPI 3 contract-first",
+      [
+        "GraphQL como padrão único",
+        "gRPC em todos os serviços",
+        "SOAP com contratos WSDL",
+      ],
+    ),
+    q(
+      "Qual é o monólito legado ainda ativo na Quero Delivery?",
+      "qd-api-geral",
+      ["qd-order-service", "qd-cart-service", "qd-users-service"],
+    ),
+    q(
+      "Segundo o Pull Request Guide, qual é o tamanho máximo recomendado de um PR?",
+      "200 linhas alteradas",
+      ["100 linhas alteradas", "2000 linhas alteradas", "Não há limite recomendado"],
+    ),
+    q(
+      "Qual padrão de mensagens de commit a Quero Delivery utiliza?",
+      "Conventional Commits",
+      ["Gitmoji", "Mensagens livres, sem padrão", "Somente o número da issue"],
+    ),
+    q(
+      "Como os tópicos Kafka são nomeados no padrão da QD?",
+      "SERVICE.ENTITY.EVENT",
+      ["EVENT-ENTITY-SERVICE", "kafka_topic_<numero>", "ENTITY/EVENT/SERVICE"],
+    ),
+    q(
+      "Na arquitetura em camadas dos serviços QD, para onde as dependências devem apontar?",
+      "Para dentro, com o domain no centro",
+      [
+        "Para fora, com a infraestrutura no centro",
+        "Do domain diretamente para o banco de dados",
+        "Não há regra de direção de dependência",
+      ],
+    ),
+    q(
+      "Qual prefixo o styleguide da QD usa para interfaces em TypeScript?",
+      "I (ex.: IUser)",
+      ["T (ex.: TUser)", "Interface (ex.: InterfaceUser)", "Nenhum prefixo"],
+    ),
+    q(
+      "Qual pacote interno fornece factories como App, Health e Kafka aos serviços?",
+      "@querodelivery/qd-packages",
+      [
+        "@querodelivery/qd-core",
+        "@nestjs/common",
+        "@querodelivery/qd-orm",
+      ],
+    ),
+    q(
+      "Qual endpoint todos os microserviços da QD expõem para verificação de saúde?",
+      "GET /health",
+      ["GET /status", "GET /ping", "GET /api/alive"],
+    ),
+    q(
+      "Por que o consumer de Kafka na QD deve ser idempotente?",
+      "Porque a entrega é at-least-once e um evento pode ser reprocessado",
+      [
+        "Porque a entrega é exactly-once e nunca se repete",
+        "Porque o Kafka não garante ordem alguma",
+        "Porque o consumer não pode acessar o banco de dados",
+      ],
+    ),
+    q(
+      "Qual é o caminho de deploy do CI/CD na Quero Delivery?",
+      "GitHub Actions → ECR → EKS",
+      [
+        "Jenkins → Docker Hub → ECS",
+        "GitLab CI → GCR → GKE",
+        "CircleCI → ECR → Lambda",
+      ],
+    ),
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// Quero Delivery — Infraestrutura (Intraweb e Workers)
+// ---------------------------------------------------------------------------
+const qdInfraQuiz: QuizInput = {
+  title: "Quero Delivery: Infraestrutura (Intraweb e Workers)",
+  description:
+    "10 perguntas sobre a infraestrutura da Quero Delivery: comunicação intraweb no cluster Kubernetes e workers assíncronos.",
+  questions: [
+    q(
+      "O que é comunicação intraweb na Quero Delivery?",
+      "Tráfego HTTP entre serviços dentro do mesmo cluster Kubernetes, sem sair para a internet",
+      [
+        "Tráfego HTTPS entre o cluster e clientes externos",
+        "Comunicação por e-mail entre times de infraestrutura",
+        "Acesso público às APIs via domínios da internet",
+      ],
+    ),
+    q(
+      "Qual protocolo é usado na comunicação intraweb (dentro do cluster)?",
+      "HTTP",
+      ["HTTPS com mTLS obrigatório", "gRPC sobre TLS", "FTP"],
+    ),
+    q(
+      "Qual é o padrão de URL interna de um serviço em produção?",
+      "http://{service-name}.services.local.quero.io/api",
+      [
+        "https://{service-name}.services.local.quero.io/api",
+        "http://{service-name}.stg.services.local.quero.io/api",
+        "https://api.quero.io/{service-name}",
+      ],
+    ),
+    q(
+      "Por que a QD usa HTTP e não HTTPS na comunicação intraweb?",
+      "Porque a rede interna é considerada confiável e evita a complexidade de certificados",
+      [
+        "Porque o Kubernetes não suporta HTTPS entre pods",
+        "Porque HTTPS é mais lento apenas em produção",
+        "Porque os serviços não trocam dados entre si",
+      ],
+    ),
+    q(
+      "Como os serviços resolvem o nome uns dos outros dentro do cluster?",
+      "Via DNS interno do Kubernetes (CoreDNS)",
+      [
+        "Consultando um arquivo hosts em cada pod",
+        "Por meio de um balanceador externo público",
+        "Usando endereços IP fixos escritos no código",
+      ],
+    ),
+    q(
+      "As URLs intraweb podem ser usadas em front-ends ou apps móveis?",
+      "Não; são apenas para comunicação serviço-a-serviço dentro do cluster",
+      [
+        "Sim, desde que usem HTTPS",
+        "Sim, são as URLs públicas oficiais",
+        "Sim, apenas no ambiente de stage",
+      ],
+    ),
+    q(
+      "Por que separar o processamento assíncrono em um worker próprio?",
+      "Porque o Node usa um único event loop e consumer Kafka e HTTP disputam o mesmo processo",
+      [
+        "Porque o Node não consegue rodar consumers Kafka",
+        "Porque cada worker precisa de um banco de dados separado",
+        "Porque a API não pode acessar o Kafka de jeito nenhum",
+      ],
+    ),
+    q(
+      "Subir uma réplica a mais de um worker sempre aumenta a vazão de consumo?",
+      "Não; as partições são divididas no consumer group e réplicas além do nº de partições ficam ociosas",
+      [
+        "Sim, cada réplica dobra a vazão do consumo",
+        "Sim, o Kafka replica as mensagens para todas as réplicas",
+        "Sim, desde que todas usem o mesmo consumer group",
+      ],
+    ),
+    q(
+      "Qual é a regra para a contagem de réplicas de um worker em produção?",
+      "Uma réplica por partição, até o número de partições do tópico",
+      [
+        "O dobro do número de partições do tópico",
+        "Uma réplica por serviço, independente das partições",
+        "Sempre o número máximo permitido pelo cluster",
+      ],
+    ),
+    q(
+      "O worker usa uma imagem Docker própria, diferente da API?",
+      "Não; usa a mesma imagem da API, subida com outro entrypoint (command)",
+      [
+        "Sim, tem repositório, build e imagem próprios",
+        "Sim, mas compartilha a tag da imagem da API",
+        "Não; o worker roda dentro do mesmo processo da API",
+      ],
+    ),
+  ],
+};
+
 const quizzes: QuizInput[] = [
   aiQuiz,
   mcpQuiz,
@@ -1011,6 +1506,10 @@ const quizzes: QuizInput[] = [
   systemDesignEasyQuiz,
   systemDesignMediumQuiz,
   systemDesignHardQuiz,
+  distributedSystemsEasyQuiz,
+  eventSourcingQuiz,
+  qdRoadmapQuiz,
+  qdInfraQuiz,
 ];
 
 async function run() {
