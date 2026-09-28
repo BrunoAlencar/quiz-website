@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import pg from "pg";
-import { createQuiz, getQuiz, listQuizzes, updateQuiz, getQuizForPlay } from "@/server/repositories/quizzes";
+import { createQuiz, getQuiz, listQuizzes, updateQuiz, getQuizForPlay, deleteQuiz } from "@/server/repositories/quizzes";
 import { createGame, getGameByCode, setGameStatus, finalizeGame } from "@/server/repositories/games";
 import { createPlayer, listPlayers, setPlayerScore } from "@/server/repositories/players";
 import { recordAnswer } from "@/server/repositories/answers";
@@ -76,6 +76,39 @@ describe("quizzes repository", () => {
     const qs = await getQuizForPlay(pool, id);
     expect(qs).toHaveLength(1);
     expect(qs[0].options.some((o) => o.is_correct)).toBe(true);
+  });
+
+  it("deletes a quiz and cascades its questions and options", async () => {
+    const id = await createQuiz(pool, sampleInput);
+    const deleted = await deleteQuiz(pool, id);
+    expect(deleted).toBe(true);
+    expect(await getQuiz(pool, id)).toBeNull();
+    const questions = await pool.query("SELECT id FROM questions WHERE quiz_id = $1", [id]);
+    expect(questions.rowCount).toBe(0);
+  });
+
+  it("deletes a quiz along with its games, players, and answers", async () => {
+    const id = await createQuiz(pool, sampleInput);
+    const quiz = await getQuiz(pool, id);
+    const q = quiz!.questions[0];
+    const correct = q.options.find((o) => o.is_correct)!;
+    const game = await createGame(pool, id, "DEL234");
+    const p = await createPlayer(pool, game.id, "Alex");
+    await recordAnswer(pool, {
+      gameId: game.id, playerId: p.id, questionId: q.id, optionId: correct.id,
+      isCorrect: true, responseMs: 1200, pointsAwarded: 940,
+    });
+
+    const deleted = await deleteQuiz(pool, id);
+    expect(deleted).toBe(true);
+    expect(await getQuiz(pool, id)).toBeNull();
+    expect((await pool.query("SELECT id FROM games WHERE quiz_id = $1", [id])).rowCount).toBe(0);
+    expect((await pool.query("SELECT id FROM players WHERE game_id = $1", [game.id])).rowCount).toBe(0);
+    expect((await pool.query("SELECT id FROM answers WHERE game_id = $1", [game.id])).rowCount).toBe(0);
+  });
+
+  it("returns false when deleting a missing quiz", async () => {
+    expect(await deleteQuiz(pool, "00000000-0000-0000-0000-000000000000")).toBe(false);
   });
 });
 

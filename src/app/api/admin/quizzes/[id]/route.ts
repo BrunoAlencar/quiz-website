@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { verifySession } from "@/server/auth";
 import { validateQuizInput } from "@/lib/validation";
 import { getPool } from "../../../../../../db/pool";
-import { getQuiz, updateQuiz } from "@/server/repositories/quizzes";
+import { getQuiz, updateQuiz, deleteQuiz } from "@/server/repositories/quizzes";
 
 function authed(): boolean {
   return verifySession(cookies().get("admin_session")?.value);
@@ -22,5 +22,12 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   const check = validateQuizInput(body);
   if (!check.valid) return NextResponse.json({ errors: check.errors }, { status: 400 });
   await updateQuiz(getPool(), params.id, body);
+  return NextResponse.json({ ok: true });
+}
+
+export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+  if (!authed()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const deleted = await deleteQuiz(getPool(), params.id);
+  if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json({ ok: true });
 }

@@ -147,6 +147,9 @@ input[type="radio"] { accent-color: var(--green); width: 20px; height: 20px; cur
 .entry b { display: block; font-size: 1.1rem; }
 .entry small { color: var(--muted); }
 .quiz-list { display: grid; gap: 12px; width: 100%; }
+.quiz-row { display: flex; align-items: stretch; gap: 12px; width: 100%; }
+.quiz-row .quiz-item { flex: 1 1 auto; }
+.quiz-row .btn-danger { flex: none; }
 .quiz-item { justify-content: space-between; }
 .quiz-item .meta { color: var(--muted); font-size: 0.9rem; white-space: nowrap; }
 

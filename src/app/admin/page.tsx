@@ -47,6 +47,13 @@ export default function AdminPage() {
     if (res.ok) { const { id } = await res.json(); window.location.href = `/admin/quiz/${id}`; }
   }
 
+  async function deleteQuiz(id: string, title: string) {
+    if (!window.confirm(`Delete "${title}" and all its questions and game history? This cannot be undone.`)) return;
+    const res = await fetch(`/api/admin/quizzes/${id}`, { method: "DELETE", credentials: "include" });
+    if (res.ok) loadQuizzes();
+    else setError("Could not delete the quiz. Please try again.");
+  }
+
   if (!authed) {
     return (
       <main className="screen screen--narrow">
@@ -78,13 +85,23 @@ export default function AdminPage() {
       ) : (
         <div className="quiz-list">
           {quizzes.map((q) => (
-            <Link key={q.id} className="quiz-item" href={`/admin/quiz/${q.id}`}>
-              <span>{q.title}</span>
-              <span className="meta">{q.question_count} questions →</span>
-            </Link>
+            <div key={q.id} className="quiz-row">
+              <Link className="quiz-item" href={`/admin/quiz/${q.id}`}>
+                <span>{q.title}</span>
+                <span className="meta">{q.question_count} questions →</span>
+              </Link>
+              <button
+                className="btn btn-danger btn-sm"
+                onClick={() => deleteQuiz(q.id, q.title)}
+                aria-label={`Delete ${q.title}`}
+              >
+                Delete
+              </button>
+            </div>
           ))}
         </div>
       )}
+      {authed && error && <p className="error">{error}</p>}
     </main>
   );
 }

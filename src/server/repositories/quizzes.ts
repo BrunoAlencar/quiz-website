@@ -87,6 +87,26 @@ export async function getQuizForPlay(db: DB, quizId: string): Promise<Question[]
   return loadQuestions(db, quizId);
 }
 
+export async function deleteQuiz(db: DB, id: string): Promise<boolean> {
+  const isPool = typeof (db as pg.Pool).connect === "function" && !("release" in db);
+  const client = isPool ? await (db as pg.Pool).connect() : (db as pg.PoolClient);
+  try {
+    await client.query("BEGIN");
+    // games -> quizzes uses ON DELETE RESTRICT, so remove games first
+    // (players and answers cascade off games automatically). questions and
+    // options then cascade off the quiz itself.
+    await client.query("DELETE FROM games WHERE quiz_id = $1", [id]);
+    const res = await client.query("DELETE FROM quizzes WHERE id = $1", [id]);
+    await client.query("COMMIT");
+    return (res.rowCount ?? 0) > 0;
+  } catch (e) {
+    await client.query("ROLLBACK");
+    throw e;
+  } finally {
+    if (isPool) (client as pg.PoolClient).release();
+  }
+}
+
 export async function updateQuiz(db: DB, id: string, input: QuizInput): Promise<void> {
   const isPool = typeof (db as pg.Pool).connect === "function" && !("release" in db);
   const client = isPool ? await (db as pg.Pool).connect() : (db as pg.PoolClient);
