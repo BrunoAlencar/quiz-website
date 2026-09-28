@@ -10,6 +10,7 @@
     "migrate": "tsx db/migrate.ts",
     "seed:styleguide": "tsx db/seed-styleguide.ts",
     "seed:kafka-partitions": "tsx db/seed-kafka-partitions.ts",
+    "seed:general-knowledge": "tsx db/seed-general-knowledge.ts",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
