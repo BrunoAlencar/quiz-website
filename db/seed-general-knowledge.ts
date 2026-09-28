@@ -567,6 +567,440 @@ const mongoAdvancedQuiz: QuizInput = {
   ],
 };
 
+// ---------------------------------------------------------------------------
+// System Design (Fácil)
+// ---------------------------------------------------------------------------
+const systemDesignEasyQuiz: QuizInput = {
+  title: "System Design: Fundamentos (Fácil)",
+  description:
+    "15 perguntas de nível fácil sobre fundamentos de system design: cliente-servidor, cache, DNS, load balancer, escalabilidade e mais.",
+  questions: [
+    q(
+      "O que descreve a arquitetura cliente-servidor?",
+      "O cliente faz requisições e o servidor responde com recursos ou serviços",
+      [
+        "Todos os computadores têm exatamente o mesmo papel",
+        "Um único computador executa tudo sem rede",
+        "Os dados só existem no navegador do usuário",
+      ],
+    ),
+    q(
+      "O que faz um load balancer (balanceador de carga)?",
+      "Distribui as requisições entre vários servidores",
+      [
+        "Armazena os dados de forma permanente",
+        "Criptografa o banco de dados",
+        "Compila o código da aplicação",
+      ],
+    ),
+    q(
+      "Para que serve o DNS?",
+      "Traduzir nomes de domínio em endereços IP",
+      [
+        "Armazenar sessões de usuário",
+        "Comprimir imagens do site",
+        "Balancear a carga entre bancos de dados",
+      ],
+    ),
+    q(
+      "O que é latência em um sistema?",
+      "O tempo que uma requisição leva para ir e voltar (o atraso)",
+      [
+        "A quantidade de dados armazenados",
+        "O número de servidores disponíveis",
+        "A quantidade de usuários cadastrados",
+      ],
+    ),
+    q(
+      "O que significa throughput (vazão)?",
+      "A quantidade de requisições processadas por unidade de tempo",
+      [
+        "O tempo de resposta de uma única requisição",
+        "O espaço livre em disco",
+        "O número de linhas de código",
+      ],
+    ),
+    q(
+      "Qual a diferença entre escala vertical e horizontal?",
+      "Vertical adiciona mais recursos a uma máquina; horizontal adiciona mais máquinas",
+      [
+        "Vertical adiciona máquinas; horizontal adiciona memória",
+        "As duas significam exatamente a mesma coisa",
+        "Vertical só funciona em bancos NoSQL",
+      ],
+    ),
+    q(
+      "Para que serve um cache?",
+      "Armazenar dados acessados com frequência para respostas mais rápidas",
+      [
+        "Guardar backups de longo prazo",
+        "Substituir o banco de dados principal para sempre",
+        "Criptografar as senhas dos usuários",
+      ],
+    ),
+    q(
+      "O que é uma API?",
+      "Uma interface que permite a comunicação entre sistemas",
+      [
+        "Um tipo de banco de dados relacional",
+        "Um servidor físico de alta performance",
+        "Um protocolo de criptografia de disco",
+      ],
+    ),
+    q(
+      "O que caracteriza um serviço \"stateless\" (sem estado)?",
+      "Cada requisição é independente e não depende de estado guardado no servidor",
+      [
+        "O servidor guarda toda a sessão do usuário em memória",
+        "O serviço só funciona com um único usuário por vez",
+        "O serviço nunca acessa nenhum banco de dados",
+      ],
+    ),
+    q(
+      "O que é uma CDN (Content Delivery Network)?",
+      "Uma rede de servidores distribuídos que entrega conteúdo próximo ao usuário",
+      [
+        "Um banco de dados central único",
+        "Um algoritmo de compressão de vídeo",
+        "Um protocolo de autenticação",
+      ],
+    ),
+    q(
+      "Qual protocolo é a base da comunicação na web?",
+      "HTTP/HTTPS",
+      ["FTP", "SMTP", "SSH"],
+    ),
+    q(
+      "O que o HTTPS adiciona em relação ao HTTP?",
+      "Criptografia da comunicação por meio de TLS",
+      [
+        "Maior velocidade sem qualquer segurança",
+        "Compressão obrigatória de todas as imagens",
+        "A eliminação da necessidade de servidores",
+      ],
+    ),
+    q(
+      "O que é um banco de dados relacional?",
+      "Um banco que organiza os dados em tabelas com linhas e colunas",
+      [
+        "Um banco que só guarda arquivos de imagem",
+        "Um banco sem qualquer estrutura ou esquema",
+        "Um banco que roda apenas na memória do cliente",
+      ],
+    ),
+    q(
+      "Qual a função de uma fila (queue) em um sistema?",
+      "Armazenar tarefas para processamento assíncrono, em ordem",
+      [
+        "Servir páginas HTML diretamente ao navegador",
+        "Substituir o balanceador de carga",
+        "Criptografar o tráfego de rede",
+      ],
+    ),
+    q(
+      "O que é redundância em system design?",
+      "Ter componentes duplicados para evitar um ponto único de falha",
+      [
+        "Remover todos os componentes desnecessários",
+        "Executar o sistema em um único servidor",
+        "Apagar dados repetidos do banco",
+      ],
+    ),
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// System Design (Médio)
+// ---------------------------------------------------------------------------
+const systemDesignMediumQuiz: QuizInput = {
+  title: "System Design: Intermediário (Médio)",
+  description:
+    "15 perguntas de nível intermediário sobre system design: sharding, replicação, CAP, filas, rate limiting, microserviços e mais.",
+  questions: [
+    q(
+      "O que é sharding (particionamento) de banco de dados?",
+      "Dividir os dados em partições distribuídas entre vários servidores",
+      [
+        "Fazer uma cópia idêntica em cada servidor",
+        "Criptografar todas as tabelas do banco",
+        "Compactar os dados em um único arquivo",
+      ],
+    ),
+    q(
+      "Na replicação leader-follower, quem recebe as escritas?",
+      "O leader (primário), que depois replica para os followers",
+      [
+        "Qualquer follower, aleatoriamente",
+        "Todos os nós ao mesmo tempo, sem coordenação",
+        "Apenas o cliente, sem envolver o servidor",
+      ],
+    ),
+    q(
+      "O que o teorema CAP afirma?",
+      "Sob uma partição de rede, escolhe-se entre consistência e disponibilidade",
+      [
+        "É possível garantir consistência, disponibilidade e partição sempre",
+        "Bancos NoSQL não podem ser distribuídos",
+        "A latência é sempre igual à vazão",
+      ],
+    ),
+    q(
+      "O que é consistência eventual (eventual consistency)?",
+      "As réplicas convergem para o mesmo valor com o tempo, sem garantia imediata",
+      [
+        "Todas as réplicas ficam idênticas instantaneamente",
+        "Os dados nunca ficam consistentes entre réplicas",
+        "A escrita é bloqueada até todos concordarem",
+      ],
+    ),
+    q(
+      "Para que serve o rate limiting?",
+      "Limitar quantas requisições um cliente pode fazer em um período",
+      [
+        "Aumentar a velocidade de todas as requisições",
+        "Armazenar as requisições em cache permanente",
+        "Distribuir os dados entre shards",
+      ],
+    ),
+    q(
+      "Por que criar um índice em um banco de dados?",
+      "Para acelerar as consultas que filtram por aquele campo",
+      [
+        "Para reduzir sempre o espaço em disco",
+        "Para impedir a leitura de certos campos",
+        "Para criptografar automaticamente a tabela",
+      ],
+    ),
+    q(
+      "Qual a vantagem de microserviços sobre um monólito?",
+      "Permitem escalar e implantar serviços de forma independente",
+      [
+        "Eliminam totalmente a comunicação em rede",
+        "Garantem que nunca haverá falhas",
+        "Dispensam bancos de dados por completo",
+      ],
+    ),
+    q(
+      "O que é idempotência em uma operação?",
+      "Executá-la várias vezes produz o mesmo resultado que executá-la uma vez",
+      [
+        "A operação só pode ser executada uma única vez para sempre",
+        "A operação sempre falha na segunda tentativa",
+        "A operação depende da ordem dos usuários",
+      ],
+    ),
+    q(
+      "Para que serve um health check em um serviço?",
+      "Verificar se a instância está saudável para receber tráfego",
+      [
+        "Fazer backup automático dos dados",
+        "Criptografar as respostas ao cliente",
+        "Aumentar o limite de memória do servidor",
+      ],
+    ),
+    q(
+      "Qual a diferença entre cache write-through e write-back?",
+      "Write-through grava no cache e no banco juntos; write-back grava no banco depois",
+      [
+        "Write-through nunca grava no banco de dados",
+        "Write-back grava no cache e no banco ao mesmo tempo",
+        "Não há diferença entre os dois",
+      ],
+    ),
+    q(
+      "O que é uma dead-letter queue?",
+      "Uma fila que recebe mensagens que não puderam ser processadas",
+      [
+        "Uma fila que só aceita mensagens prioritárias",
+        "Uma fila que apaga mensagens automaticamente sem processar",
+        "Uma fila usada apenas para logs de acesso",
+      ],
+    ),
+    q(
+      "O que é um proxy reverso?",
+      "Um servidor que recebe requisições dos clientes e as encaminha ao backend",
+      [
+        "Um cliente que acessa a internet sem servidor",
+        "Um banco de dados replicado em cada região",
+        "Um algoritmo de compressão de dados",
+      ],
+    ),
+    q(
+      "O que é a estratégia \"database per service\" em microserviços?",
+      "Cada serviço possui seu próprio banco de dados privado",
+      [
+        "Todos os serviços compartilham um único banco global",
+        "Nenhum serviço pode usar banco de dados",
+        "O banco é substituído por arquivos de texto",
+      ],
+    ),
+    q(
+      "Qual a diferença entre polling e webhook?",
+      "Polling consulta repetidamente; webhook notifica quando o evento ocorre",
+      [
+        "Polling notifica em tempo real; webhook consulta em loop",
+        "Os dois consomem exatamente os mesmos recursos",
+        "Webhook só funciona dentro de um monólito",
+      ],
+    ),
+    q(
+      "O que é uma sticky session?",
+      "Quando o load balancer envia as requisições de um mesmo usuário ao mesmo servidor",
+      [
+        "Quando a sessão nunca expira no navegador",
+        "Quando o servidor descarta o estado a cada requisição",
+        "Quando todos os servidores compartilham a mesma senha",
+      ],
+    ),
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// System Design (Difícil)
+// ---------------------------------------------------------------------------
+const systemDesignHardQuiz: QuizInput = {
+  title: "System Design: Avançado (Difícil)",
+  description:
+    "15 perguntas de nível avançado sobre system design: consenso, consistent hashing, quorum, CRDTs, saga, WAL e mais.",
+  questions: [
+    q(
+      "Qual é o objetivo de um algoritmo de consenso como Raft ou Paxos?",
+      "Fazer múltiplos nós concordarem sobre um valor de forma tolerante a falhas",
+      [
+        "Comprimir os dados replicados entre os nós",
+        "Criptografar a comunicação entre serviços",
+        "Balancear a carga entre servidores web",
+      ],
+    ),
+    q(
+      "O que é consistent hashing?",
+      "Uma técnica de distribuição que minimiza a realocação de chaves ao mudar de nós",
+      [
+        "Uma função de hash que gera sempre o mesmo IP",
+        "Um algoritmo que criptografa as chaves do cache",
+        "Uma forma de ordenar tabelas alfabeticamente",
+      ],
+    ),
+    q(
+      "Na configuração de quorum, o que a condição R + W > N garante?",
+      "Que os conjuntos de leitura e escrita se sobrepõem, permitindo leitura consistente",
+      [
+        "Que a escrita é sempre mais rápida que a leitura",
+        "Que nenhum nó precisa replicar dados",
+        "Que o sistema nunca fica indisponível",
+      ],
+    ),
+    q(
+      "Para que servem os vector clocks?",
+      "Detectar a ordem causal e conflitos entre eventos em sistemas distribuídos",
+      [
+        "Sincronizar o relógio físico de todos os servidores",
+        "Medir a latência da rede em milissegundos",
+        "Criptografar o timestamp de cada requisição",
+      ],
+    ),
+    q(
+      "O que é um CRDT (Conflict-free Replicated Data Type)?",
+      "Uma estrutura de dados que converge automaticamente sem coordenação central",
+      [
+        "Um tipo de índice exclusivo para bancos SQL",
+        "Um protocolo de commit em duas fases",
+        "Um algoritmo de compressão sem perdas",
+      ],
+    ),
+    q(
+      "O que é o padrão Saga em transações distribuídas?",
+      "Uma sequência de transações locais com compensações em caso de falha",
+      [
+        "Um bloqueio global em todos os serviços ao mesmo tempo",
+        "Uma única transação ACID entre todos os bancos",
+        "Um cache distribuído entre microserviços",
+      ],
+    ),
+    q(
+      "O que é o Two-Phase Commit (2PC)?",
+      "Um protocolo de commit atômico coordenado em duas fases: prepare e commit",
+      [
+        "Um algoritmo de balanceamento de carga em dois níveis",
+        "Uma técnica de particionamento de dados em dois shards",
+        "Um esquema de cache com duas camadas",
+      ],
+    ),
+    q(
+      "O que é backpressure em um sistema de streaming?",
+      "Um mecanismo para o consumidor sinalizar que não acompanha o produtor",
+      [
+        "Um aumento automático da taxa de envio do produtor",
+        "Uma forma de comprimir mensagens na fila",
+        "Um algoritmo de criptografia de fluxo",
+      ],
+    ),
+    q(
+      "Para que serve um Bloom filter?",
+      "Testar de forma probabilística se um elemento pode estar em um conjunto",
+      [
+        "Garantir com certeza absoluta a presença de um elemento",
+        "Ordenar elementos de um conjunto por relevância",
+        "Criptografar as chaves de um índice",
+      ],
+    ),
+    q(
+      "O que é uma \"hot partition\" (partição quente)?",
+      "Uma partição que recebe tráfego desproporcional e vira um gargalo",
+      [
+        "Uma partição mantida apenas em memória rápida",
+        "Uma partição que nunca recebe requisições",
+        "Uma partição criptografada por padrão",
+      ],
+    ),
+    q(
+      "Para que serve um Write-Ahead Log (WAL)?",
+      "Registrar as alterações antes de aplicá-las, garantindo durabilidade e recuperação",
+      [
+        "Guardar apenas logs de acesso dos usuários",
+        "Comprimir o banco de dados periodicamente",
+        "Distribuir a carga entre réplicas de leitura",
+      ],
+    ),
+    q(
+      "O que caracteriza uma leitura linearizável (linearizability)?",
+      "Toda leitura enxerga a escrita mais recente, como se houvesse uma única cópia",
+      [
+        "As leituras podem retornar valores antigos indefinidamente",
+        "As escritas são aplicadas em ordem aleatória",
+        "As leituras nunca bloqueiam, mesmo sob conflito",
+      ],
+    ),
+    q(
+      "O que é o problema de \"split-brain\" em sistemas distribuídos?",
+      "Quando uma partição de rede faz dois nós agirem como líder ao mesmo tempo",
+      [
+        "Quando um nó perde toda a sua memória cache",
+        "Quando o banco de dados excede o limite de disco",
+        "Quando dois clientes usam a mesma senha",
+      ],
+    ),
+    q(
+      "Para que serve o mecanismo de leader election?",
+      "Escolher um único nó coordenador entre vários nós",
+      [
+        "Distribuir dados uniformemente entre shards",
+        "Criptografar a comunicação entre os nós",
+        "Eliminar a necessidade de réplicas",
+      ],
+    ),
+    q(
+      "O que é MVCC (Multi-Version Concurrency Control)?",
+      "Manter múltiplas versões dos dados para permitir leituras sem bloquear escritas",
+      [
+        "Executar uma única versão do dado por vez, com lock global",
+        "Criar uma cópia física do banco a cada leitura",
+        "Impedir qualquer escrita concorrente no sistema",
+      ],
+    ),
+  ],
+};
+
 const quizzes: QuizInput[] = [
   aiQuiz,
   mcpQuiz,
@@ -574,6 +1008,9 @@ const quizzes: QuizInput[] = [
   harnessQuiz,
   mongoQuiz,
   mongoAdvancedQuiz,
+  systemDesignEasyQuiz,
+  systemDesignMediumQuiz,
+  systemDesignHardQuiz,
 ];
 
 async function run() {
