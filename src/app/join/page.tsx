@@ -9,13 +9,16 @@ function JoinInner() {
   const [code, setCode] = useState((params.get("code") ?? "").toUpperCase());
   const [nickname, setNickname] = useState("");
   const [error, setError] = useState("");
+  const [joining, setJoining] = useState(false);
 
   function join(e: React.FormEvent) {
     e.preventDefault();
+    if (joining) return;
     setError("");
+    setJoining(true);
     const socket = getSocket();
     socket.emit("player:join", { joinCode: code.toUpperCase(), nickname }, (res) => {
-      if ("error" in res) { setError(res.error); return; }
+      if ("error" in res) { setError(res.error); setJoining(false); return; }
       sessionStorage.setItem("playerId", res.playerId);
       sessionStorage.setItem("gameId", res.gameId);
       sessionStorage.setItem("nickname", res.nickname);
@@ -53,7 +56,9 @@ function JoinInner() {
             onChange={(e) => setNickname(e.target.value)} />
         </label>
         {error && <p className="error">{error}</p>}
-        <button type="submit" className="btn btn-primary btn-lg btn-block">Enter game</button>
+        <button type="submit" className="btn btn-primary btn-lg btn-block" disabled={joining}>
+          {joining ? "Joining…" : "Enter game"}
+        </button>
       </form>
     </main>
   );
