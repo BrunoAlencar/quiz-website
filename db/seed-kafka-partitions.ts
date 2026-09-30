@@ -39,7 +39,7 @@ const quiz: QuizInput = {
       "Uma subdivisão de um tópico que permite paralelismo",
       [
         "Um servidor (broker) do cluster Kafka",
-        "Um consumidor de mensagens",
+        "Um consumidor responsável por ler as mensagens gravadas no tópico",
         "Um tipo específico de mensagem",
       ],
     ),
@@ -61,7 +61,7 @@ const quiz: QuizInput = {
       "Quando uma mensagem tem uma chave (key), o que determina em qual partition ela é gravada?",
       "A chave da mensagem (via hash da key)",
       [
-        "O tamanho da mensagem",
+        "O tamanho total da mensagem enviada ao broker",
         "O horário em que foi enviada",
         "O nome do consumidor",
       ],
@@ -72,7 +72,7 @@ const quiz: QuizInput = {
       [
         "Sempre na partition 0",
         "Sempre na última partition",
-        "Não são gravadas",
+        "Não são gravadas em nenhuma partition do tópico e acabam descartadas",
       ],
     ),
     q(
@@ -89,7 +89,7 @@ const quiz: QuizInput = {
       "A posição sequencial da mensagem dentro da partition",
       [
         "O tamanho da mensagem em bytes",
-        "O identificador do tópico",
+        "O identificador único do tópico onde a mensagem foi gravada",
         "O número de consumidores do grupo",
       ],
     ),
@@ -104,7 +104,7 @@ const quiz: QuizInput = {
     ),
     q(
       "Dentro de um mesmo consumer group, quantos consumidores podem ler de uma mesma partition ao mesmo tempo?",
-      "Apenas um",
+      "Somente um consumidor",
       ["Todos os consumidores do grupo", "Exatamente dois", "Um número ilimitado"],
     ),
     q(
@@ -120,7 +120,7 @@ const quiz: QuizInput = {
       "É possível diminuir o número de partitions de um tópico já existente no Kafka?",
       "Não; só é possível aumentar o número de partitions",
       [
-        "Sim, a qualquer momento",
+        "Sim, a qualquer momento, bastando reconfigurar o tópico",
         "Sim, mas apenas pela metade",
         "Sim, o Kafka ajusta automaticamente",
       ],
@@ -130,7 +130,7 @@ const quiz: QuizInput = {
       "A replicação da partition em outros brokers (réplicas)",
       [
         "O offset das mensagens",
-        "A chave das mensagens",
+        "A chave usada em cada uma das mensagens gravadas no tópico",
         "A quantidade de consumer groups",
       ],
     ),
@@ -149,14 +149,14 @@ const quiz: QuizInput = {
       [
         "Em todo o tópico, entre todas as partitions",
         "Em todo o cluster, entre todos os tópicos",
-        "Nunca é garantida em lugar nenhum",
+        "A ordem nunca é garantida em lugar nenhum do cluster Kafka",
       ],
     ),
     q(
       "Para garantir que mensagens relacionadas (ex.: de um mesmo pedido) fiquem ordenadas, o que você deve fazer?",
       "Usar a mesma chave (key) para que caiam na mesma partition",
       [
-        "Enviar as mensagens sem nenhuma chave",
+        "Enviar todas as mensagens relacionadas sem nenhuma chave definida",
         "Enviar cada mensagem em um tópico diferente",
         "Aumentar o número de partitions do tópico",
       ],
