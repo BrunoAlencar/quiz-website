@@ -36,7 +36,7 @@ export default function AdminPage() {
       body: JSON.stringify({
         title: "Untitled quiz",
         questions: [{
-          text: "New question", time_limit_seconds: 20, points_base: 1000,
+          text: "New question", time_limit_seconds: 30, points_base: 1000,
           options: [
             { text: "Option A", is_correct: true }, { text: "Option B", is_correct: false },
             { text: "Option C", is_correct: false }, { text: "Option D", is_correct: false },
@@ -78,7 +78,10 @@ export default function AdminPage() {
     <main className="screen screen--wide">
       <div className="row-between">
         <h1>Quizzes</h1>
-        <button className="btn btn-primary" onClick={createBlank}>New quiz</button>
+        <div className="btn-row">
+          <Link className="btn" href="/admin/dashboard">Dashboard</Link>
+          <button className="btn btn-primary" onClick={createBlank}>New quiz</button>
+        </div>
       </div>
       {quizzes.length === 0 ? (
         <p className="muted">No quizzes yet. Create your first one to get started.</p>

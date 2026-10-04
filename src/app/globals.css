@@ -410,3 +410,24 @@ input[type="radio"] { accent-color: var(--green); width: 20px; height: 20px; cur
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
+
+/* ---- Host extras: mute toggle beside the timer, scrollable final ranking ---- */
+.timer-group { display: flex; align-items: center; gap: 10px; }
+.board-scroll { width: 100%; max-height: 60dvh; overflow-y: auto; padding: 2px; }
+
+/* ---- Admin dashboard ---- */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.stat { padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: #181a30; min-width: 0; }
+.stat small { display: block; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+.stat b { font-size: 1.7rem; font-weight: 800; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.stat b.is-text { font-size: 1.1rem; }
+.game-row { flex-wrap: wrap; }
+.game-row .meta { white-space: normal; }
+.game-detail { padding: 4px 0 8px; }
+.qstat { display: grid; gap: 8px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: #181a30; }
+.qstat-head { display: flex; justify-content: space-between; gap: 12px; font-weight: 650; }
+.qstat-head span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.qstat-head .pct { flex: none; font-weight: 800; font-variant-numeric: tabular-nums; }
+.bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.bar > i { display: block; height: 100%; border-radius: inherit; background: var(--green); }
+.qstat small { color: var(--muted); }

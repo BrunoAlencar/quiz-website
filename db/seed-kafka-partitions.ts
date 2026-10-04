@@ -19,7 +19,7 @@ const q = (
   wrong: [string, string, string],
 ) => ({
   text,
-  time_limit_seconds: 20,
+  time_limit_seconds: 30,
   points_base: 1000,
   options: shuffle([
     { text: correct, is_correct: true },

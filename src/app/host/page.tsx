@@ -27,9 +27,19 @@ export default function HostPage() {
   // directly during render — otherwise `npm run build` fails while prerendering /host.
   const [origin, setOrigin] = useState("");
 
+  const [muted, setMuted] = useState(false);
+
   useEffect(() => {
     if (typeof window !== "undefined") setOrigin(window.location.origin);
+    try { setMuted(localStorage.getItem("quiz:muted") === "1"); } catch { /* storage unavailable */ }
   }, []);
+
+  function toggleMuted() {
+    setMuted((m) => {
+      try { localStorage.setItem("quiz:muted", m ? "0" : "1"); } catch { /* storage unavailable */ }
+      return !m;
+    });
+  }
 
   useEffect(() => {
     (async () => {
@@ -125,7 +135,17 @@ export default function HostPage() {
       <main className="screen screen--wide">
         <div className="stage-top">
           <span className="progress">Question {question.index + 1} / {question.total}</span>
-          <Countdown seconds={question.time_limit_seconds} keySeed={question.id} />
+          <div className="timer-group">
+            <button
+              className="btn btn-sm"
+              onClick={toggleMuted}
+              aria-pressed={muted}
+              aria-label={muted ? "Unmute tick sound" : "Mute tick sound"}
+            >
+              {muted ? "🔇" : "🔊"}
+            </button>
+            <Countdown seconds={question.time_limit_seconds} keySeed={question.id} sound={!muted} />
+          </div>
         </div>
         <h1 className="question">{question.text}</h1>
         <p className="tally">{answered.answered} / {answered.total} answered</p>
@@ -181,7 +201,8 @@ export default function HostPage() {
       <main className="screen screen--wide screen--center">
         {brand}
         <h1>Final results</h1>
-        <Leaderboard entries={board.slice(0, 5)} />
+        <p className="muted" style={{ margin: 0 }}>{board.length} {board.length === 1 ? "player" : "players"}</p>
+        <div className="board-scroll"><Leaderboard entries={board} /></div>
         <a className="link" href="/host">Host another game</a>
       </main>
     );

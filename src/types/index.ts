@@ -64,6 +64,35 @@ export interface PlayerResult {
   correct_option_id: string;
 }
 
+// ---- Admin dashboard (ended games only) ----
+
+export interface DashboardOverview {
+  games_played: number;
+  participants: number;
+  accuracy_pct: number | null; // correct answers / answers given
+  top_quiz_title: string | null;
+}
+
+export interface PastGame {
+  id: string;
+  quiz_id: string;
+  quiz_title: string;
+  ended_at: string;
+  player_count: number;
+  winner_nickname: string | null;
+  winner_score: number | null;
+}
+
+export interface QuestionStat {
+  question_id: string;
+  text: string;
+  position: number;
+  answers: number;
+  correct: number;
+  correct_pct: number | null;
+  avg_response_ms: number | null;
+}
+
 /** Quiz input coming from the admin UI (no ids yet). */
 export interface QuizInput {
   title: string;
