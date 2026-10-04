@@ -58,6 +58,7 @@ export default function AdminPage() {
     return (
       <main className="screen screen--narrow">
         <div className="stack">
+          <Link className="link" href="/">← Home</Link>
           <h1>Admin</h1>
           <p className="tagline">Log in to create and edit quizzes.</p>
         </div>
@@ -76,6 +77,7 @@ export default function AdminPage() {
 
   return (
     <main className="screen screen--wide">
+      <Link className="link" href="/">← Home</Link>
       <div className="row-between">
         <h1>Quizzes</h1>
         <div className="btn-row">
