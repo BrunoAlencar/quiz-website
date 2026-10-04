@@ -1,14 +1,26 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { playTick } from "@/lib/tickSound";
 
 const R = 29;
 const CIRC = 2 * Math.PI * R;
 
-export function Countdown({ seconds, keySeed }: { seconds: number; keySeed: string | number }) {
+export function Countdown({ seconds, keySeed, sound = false }: {
+  seconds: number; keySeed: string | number; sound?: boolean;
+}) {
   const [remaining, setRemaining] = useState(seconds);
+  // Read through a ref so muting mid-question doesn't restart the countdown.
+  const soundRef = useRef(sound);
+  soundRef.current = sound;
   useEffect(() => {
     setRemaining(seconds);
-    const t = setInterval(() => setRemaining((r) => (r > 0 ? r - 1 : 0)), 1000);
+    let left = seconds;
+    const t = setInterval(() => {
+      if (left <= 0) return;
+      left -= 1;
+      setRemaining(left);
+      if (left > 0 && soundRef.current) playTick(left <= 5);
+    }, 1000);
     return () => clearInterval(t);
   }, [seconds, keySeed]);
 

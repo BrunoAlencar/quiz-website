@@ -54,7 +54,7 @@ export default function QuizEditor() {
   function addQuestion() {
     setQuestions((qs) => [
       ...qs,
-      { text: "New question", time_limit_seconds: 20, points_base: 1000,
+      { text: "New question", time_limit_seconds: 30, points_base: 1000,
         options: [
           { text: "Option A", is_correct: true }, { text: "Option B", is_correct: false },
           { text: "Option C", is_correct: false }, { text: "Option D", is_correct: false },
