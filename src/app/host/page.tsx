@@ -5,6 +5,8 @@ import { getSocket } from "@/lib/socketClient";
 import { Leaderboard } from "@/components/Leaderboard";
 import { Countdown } from "@/components/Countdown";
 import { ANSWER_SHAPES } from "@/components/AnswerButton";
+import { startLobbyMusic, stopLobbyMusic } from "@/lib/lobbyMusic";
+import { playVictory } from "@/lib/victorySound";
 import type { PublicQuestion, LeaderboardEntry } from "@/types";
 
 interface Summary { id: string; title: string; question_count: number; }
@@ -40,6 +42,17 @@ export default function HostPage() {
       return !m;
     });
   }
+
+  useEffect(() => {
+    if (phase !== "lobby" || muted) return;
+    startLobbyMusic();
+    return () => stopLobbyMusic();
+  }, [phase, muted]);
+
+  // Depends on `phase` only, so the fanfare plays once when the final board appears.
+  useEffect(() => {
+    if (phase === "over" && !muted) playVictory();
+  }, [phase]);
 
   useEffect(() => {
     (async () => {
@@ -126,6 +139,14 @@ export default function HostPage() {
         </div>
         <button className="btn btn-primary btn-lg" onClick={start} disabled={players.length === 0}>
           Start game
+        </button>
+        <button
+          className="btn btn-sm"
+          onClick={toggleMuted}
+          aria-pressed={muted}
+          aria-label={muted ? "Unmute sound" : "Mute sound"}
+        >
+          {muted ? "🔇" : "🔊"}
         </button>
       </main>
     );
