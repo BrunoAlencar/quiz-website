@@ -5,6 +5,7 @@ import { getSocket } from "@/lib/socketClient";
 import { Leaderboard } from "@/components/Leaderboard";
 import { Countdown } from "@/components/Countdown";
 import { ANSWER_SHAPES } from "@/components/AnswerButton";
+import { QuestionText } from "@/components/QuestionText";
 import { startLobbyMusic, stopLobbyMusic } from "@/lib/lobbyMusic";
 import { playVictory } from "@/lib/victorySound";
 import type { PublicQuestion, LeaderboardEntry } from "@/types";
@@ -168,7 +169,7 @@ export default function HostPage() {
             <Countdown seconds={question.time_limit_seconds} keySeed={question.id} sound={!muted} />
           </div>
         </div>
-        <h1 className="question">{question.text}</h1>
+        <QuestionText text={question.text} />
         <p className="tally">{answered.answered} / {answered.total} answered</p>
         <div className="answers-static">
           {question.options.map((o, i) => (
@@ -188,7 +189,7 @@ export default function HostPage() {
         <div className="stage-top">
           <span className="progress">Question {question.index + 1} / {question.total}</span>
         </div>
-        <h1 className="question">{question.text}</h1>
+        <QuestionText text={question.text} />
         <div className="answers-static">
           {question.options.map((o, i) => {
             const count = distribution[o.id] ?? 0;

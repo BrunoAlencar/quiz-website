@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getSocket } from "@/lib/socketClient";
 import { AnswerButton } from "@/components/AnswerButton";
 import { Countdown } from "@/components/Countdown";
+import { QuestionText } from "@/components/QuestionText";
 import type { PublicQuestion, PlayerResult, LeaderboardEntry } from "@/types";
 
 type Phase = "waiting" | "question" | "answered" | "result" | "over";
@@ -109,7 +110,7 @@ export default function PlayPage() {
         </div>
 
         <div className="question-wrap">
-          <h1 className="question">{question.text}</h1>
+          <QuestionText text={question.text} />
         </div>
 
         <div className="answers" role="group" aria-label="Answers">

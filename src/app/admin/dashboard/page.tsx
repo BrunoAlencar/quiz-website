@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Leaderboard } from "@/components/Leaderboard";
+import { parseQuestionText } from "@/lib/questionText";
 import type { DashboardOverview, PastGame, QuestionStat, LeaderboardEntry } from "@/types";
 
 type Load = "loading" | "ready" | "unauthorized" | "error";
@@ -184,7 +185,7 @@ export default function DashboardPage() {
           {questions && questions.map((s) => (
             <div key={s.question_id} className="qstat">
               <div className="qstat-head">
-                <span>{s.text}</span>
+                <span>{parseQuestionText(s.text).prompt}</span>
                 <span className="pct">{s.correct_pct === null ? "–" : `${s.correct_pct}%`}</span>
               </div>
               <div className="bar" aria-hidden="true"><i style={{ width: `${s.correct_pct ?? 0}%` }} /></div>

@@ -225,6 +225,22 @@ input[type="radio"] { accent-color: var(--green); width: 20px; height: 20px; cur
   letter-spacing: -0.02em;
   text-wrap: balance;
 }
+/* Question with a code snippet: prompt on top, code below, left-aligned. */
+.question-block { display: grid; gap: 12px; min-width: 0; width: 100%; }
+.question-block .question { font-size: clamp(1.2rem, 4.2vw, 2.2rem); }
+.question-code {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #181a30;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(0.78rem, 2.8vw, 1.5rem);
+  line-height: 1.4;
+  text-align: left;
+  white-space: pre;
+  overflow-x: auto;
+}
 
 /* Answer grid fills the remaining height so the screen never scrolls. */
 .answers {

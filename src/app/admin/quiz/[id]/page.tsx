@@ -106,7 +106,8 @@ export default function QuizEditor() {
           </div>
           <label className="field">
             <span>Question text</span>
-            <input placeholder="What do you want to ask?" value={q.text}
+            <textarea placeholder="What do you want to ask?" value={q.text} rows={q.text.split("\n").length}
+              spellCheck={false}
               onChange={(e) => updateQuestion(qi, { text: e.target.value })} />
           </label>
           <div className="field-row">

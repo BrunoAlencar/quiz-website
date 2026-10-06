@@ -29,6 +29,14 @@ const q = (
   ]),
 });
 
+// Question with a JavaScript snippet, embedded as a fenced block the UI renders as code.
+const qc = (
+  text: string,
+  code: string,
+  correct: string,
+  wrong: [string, string, string],
+) => q(`${text}\n\`\`\`js\n${code.trim()}\n\`\`\``, correct, wrong);
+
 // ---------------------------------------------------------------------------
 // IA
 // ---------------------------------------------------------------------------
@@ -1496,6 +1504,199 @@ const qdInfraQuiz: QuizInput = {
   ],
 };
 
+// ---------------------------------------------------------------------------
+// Complexidade de Algoritmos — Tempo e Espaço
+// ---------------------------------------------------------------------------
+const complexityQuiz: QuizInput = {
+  title: "Complexidade de Algoritmos: Tempo e Espaço",
+  description:
+    "23 perguntas sobre complexidade de tempo e de espaço de código: Big O, laços, recursão, busca e ordenação, com trechos em JavaScript.",
+  questions: [
+    q(
+      "O que a notação Big O descreve em um algoritmo?",
+      "Como o custo cresce conforme a entrada aumenta",
+      [
+        "O tempo exato, em milissegundos, de uma execução",
+        "A quantidade de linhas de código do algoritmo",
+        "O consumo de memória do computador em repouso",
+      ],
+    ),
+    q(
+      "Qual é a complexidade de tempo de ler arr[i] em um array de n elementos?",
+      "O(1)",
+      ["O(n)", "O(log n)", "O(n²)"],
+    ),
+    q(
+      "Um único for percorre um array de n elementos somando os valores. Qual é a complexidade de tempo?",
+      "O(n)",
+      ["O(1)", "O(log n)", "O(n²)"],
+    ),
+    q(
+      "Dois for aninhados, cada um percorrendo os n elementos de um array. Qual é a complexidade de tempo?",
+      "O(n²)",
+      ["O(n)", "O(2n)", "O(n log n)"],
+    ),
+    q(
+      "Dois for em sequência (não aninhados), cada um percorrendo n elementos. Qual é a complexidade de tempo?",
+      "O(n)",
+      ["O(n²)", "O(n log n)", "O(log n)"],
+    ),
+    q(
+      "Qual é a complexidade de tempo do laço for (i = 1; i < n; i *= 2)?",
+      "O(log n)",
+      ["O(n)", "O(√n)", "O(n²)"],
+    ),
+    q(
+      "Qual é a complexidade de tempo da busca binária em um array ordenado de n elementos?",
+      "O(log n)",
+      ["O(n)", "O(1)", "O(n log n)"],
+    ),
+    q(
+      "Qual é a complexidade de tempo média de buscar uma chave em um hash map?",
+      "O(1)",
+      ["O(n)", "O(log n)", "O(n log n)"],
+    ),
+    q(
+      "Qual é a complexidade de tempo do merge sort no pior caso?",
+      "O(n log n)",
+      ["O(n²)", "O(n)", "O(log n)"],
+    ),
+    q(
+      "Qual é a complexidade de tempo do quicksort no pior caso, com pivôs sempre ruins?",
+      "O(n²)",
+      ["O(n log n)", "O(n)", "O(log n)"],
+    ),
+    q(
+      "Qual é a complexidade de tempo de fib(n) = fib(n-1) + fib(n-2) recursivo, sem memoização?",
+      "O(2ⁿ)",
+      ["O(n)", "O(n²)", "O(n log n)"],
+    ),
+    q(
+      "O que a memoização muda no Fibonacci recursivo?",
+      "Reduz o tempo para O(n), usando O(n) de memória",
+      [
+        "Reduz o tempo para O(1), sem usar memória extra",
+        "Mantém o tempo em O(2ⁿ) e reduz a memória",
+        "Aumenta o tempo para O(n²) e zera a memória",
+      ],
+    ),
+    q(
+      "Uma função soma os n elementos de um array usando só uma variável acumuladora. Qual é a complexidade de espaço extra?",
+      "O(1)",
+      ["O(n)", "O(log n)", "O(n²)"],
+    ),
+    q(
+      "Uma função cria um novo array com o dobro de cada um dos n elementos da entrada. Qual é a complexidade de espaço extra?",
+      "O(n)",
+      ["O(1)", "O(log n)", "O(n²)"],
+    ),
+    q(
+      "Qual é a complexidade de espaço da pilha de chamadas de um fatorial recursivo de n?",
+      "O(n)",
+      ["O(1)", "O(log n)", "O(2ⁿ)"],
+    ),
+    qc(
+      "Qual é a complexidade de tempo no pior caso?",
+      `
+function hasDuplicate(arr) {
+  const n = arr.length;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (arr[i] === arr[j]) return true;
+    }
+  }
+  return false;
+}`,
+      "O(n²)",
+      ["O(n)", "O(n log n)", "O(log n)"],
+    ),
+    qc(
+      "Quais são as complexidades de tempo e de espaço extra?",
+      `
+function hasDuplicate(arr) {
+  const seen = new Set();
+  for (const x of arr) {
+    if (seen.has(x)) return true;
+    seen.add(x);
+  }
+  return false;
+}`,
+      "Tempo O(n), espaço O(n)",
+      ["Tempo O(n²), espaço O(1)", "Tempo O(n), espaço O(1)", "Tempo O(log n), espaço O(n)"],
+    ),
+    qc(
+      "Qual é a complexidade de tempo?",
+      `
+function halvings(n) {
+  let steps = 0;
+  while (n > 1) {
+    n = Math.floor(n / 2);
+    steps++;
+  }
+  return steps;
+}`,
+      "O(log n)",
+      ["O(n)", "O(√n)", "O(1)"],
+    ),
+    qc(
+      "Qual é a complexidade de tempo, sendo n o tamanho de arr?",
+      `
+function firstTen(arr) {
+  let total = 0;
+  for (let i = 0; i < 10; i++) {
+    total += arr[i];
+  }
+  return total;
+}`,
+      "O(1)",
+      ["O(n)", "O(10n)", "O(log n)"],
+    ),
+    qc(
+      "Qual é a complexidade de tempo?",
+      `
+function min(arr) {
+  const sorted = [...arr];
+  sorted.sort((a, b) => a - b);
+  return sorted[0];
+}`,
+      "O(n log n)",
+      ["O(n)", "O(1)", "O(n²)"],
+    ),
+    qc(
+      "Com a e b de tamanho n, qual é a complexidade de tempo?",
+      `
+function common(a, b) {
+  return a.filter((x) => b.includes(x));
+}`,
+      "O(n²)",
+      ["O(n)", "O(n log n)", "O(1)"],
+    ),
+    qc(
+      "Qual é a complexidade de espaço da pilha de chamadas?",
+      `
+function sum(n) {
+  if (n === 0) return 0;
+  return n + sum(n - 1);
+}`,
+      "O(n)",
+      ["O(1)", "O(log n)", "O(n²)"],
+    ),
+    qc(
+      "Qual é a complexidade de espaço do array retornado?",
+      `
+function pairs(arr) {
+  const out = [];
+  for (const a of arr) {
+    for (const b of arr) out.push([a, b]);
+  }
+  return out;
+}`,
+      "O(n²)",
+      ["O(n)", "O(1)", "O(n log n)"],
+    ),
+  ],
+};
+
 const quizzes: QuizInput[] = [
   aiQuiz,
   mcpQuiz,
@@ -1510,6 +1711,7 @@ const quizzes: QuizInput[] = [
   eventSourcingQuiz,
   qdRoadmapQuiz,
   qdInfraQuiz,
+  complexityQuiz,
 ];
 
 async function run() {
